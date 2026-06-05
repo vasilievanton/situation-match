@@ -481,7 +481,14 @@
     opts.forEach(function(btn){
       btn.setAttribute("aria-pressed","false");
       btn.addEventListener("click", function(){
-        answers[current]=btn.getAttribute("data-person");
+        var person=btn.getAttribute("data-person");
+        if (answers[current]===person){
+          delete answers[current];
+          cards[current].classList.remove("answered","correct","wrong");
+          resultEl.textContent=""; resultEl.className="result";
+          paintOptions(); updateCheckLabel(); return;
+        }
+        answers[current]=person;
         cards[current].classList.add("answered");
         cards[current].classList.remove("correct","wrong");
         resultEl.textContent=""; resultEl.className="result";

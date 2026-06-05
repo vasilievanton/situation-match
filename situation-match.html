@@ -166,6 +166,7 @@
     box-shadow:0 16px 36px -20px rgba(50,35,110,.3);
     transition:outline-color .25s ease;outline:2px solid transparent;outline-offset:-2px;
   }
+  .card.answered{outline-color:var(--accent);}
   .card.correct{outline-color:var(--ok);}
   .card.wrong{outline-color:var(--err);}
   .badge{
@@ -198,6 +199,7 @@
     background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#fff;border-color:transparent;
     box-shadow:0 14px 26px -12px var(--accent-soft);
   }
+  .opt.is-used{opacity:.35;cursor:not-allowed;pointer-events:none;}
 
   /* ---------- INTERFACE 2: list + dropdown ---------- */
   .s2-head{padding:16px 20px 10px;font-weight:800;font-size:21px;letter-spacing:-.01em;}
@@ -452,9 +454,16 @@
     function scrollToCard(i){ carousel.scrollTo({ left:i*step(), behavior:"smooth" }); }
     function paintOptions(){
       var chosen=answers[current];
+      var usedElsewhere={};
+      Object.keys(answers).forEach(function(k){
+        if (parseInt(k,10)!==current) usedElsewhere[answers[k]]=true;
+      });
       opts.forEach(function(btn){
-        var on=btn.getAttribute("data-person")===chosen;
+        var person=btn.getAttribute("data-person");
+        var on=person===chosen;
+        var used=!on && !!usedElsewhere[person];
         btn.classList.toggle("is-selected", on);
+        btn.classList.toggle("is-used", used);
         btn.setAttribute("aria-pressed", on?"true":"false");
       });
     }
@@ -520,7 +529,6 @@
     var answers={};
 
     qlist.innerHTML = SITUATIONS.map(function(s,i){
-      var opts=PEOPLE.map(function(p){ return '<button class="dd-opt" type="button" data-person="'+p+'">'+p+'</button>'; }).join("");
       return '<div class="qitem" data-index="'+i+'">'
         + '<div class="qcard">'
         +   '<span class="glyph2">'+s.icon+'<span class="badge2">'+s.letter+'</span></span>'
@@ -531,7 +539,7 @@
         +     '<span class="dd-val">Выберите, кто это делал</span>'
         +     '<svg class="chev2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
         +   '</button>'
-        +   '<div class="dd-panel"><div class="dd-panel-inner">'+opts+'</div></div>'
+        +   '<div class="dd-panel"><div class="dd-panel-inner"></div></div>'
         + '</div></div>';
     }).join("");
 
@@ -544,32 +552,43 @@
       var n=Object.keys(answers).length;
       checkBtn.textContent=(n>0&&n<TOTAL)?("Проверить · "+n+"/"+TOTAL):"Проверить";
     }
+    function refreshDropdowns(){
+      items.forEach(function(item,i){
+        var inner=item.querySelector(".dd-panel-inner");
+        var usedByOthers={};
+        Object.keys(answers).forEach(function(k){
+          if (parseInt(k,10)!==i) usedByOthers[answers[k]]=true;
+        });
+        var available=PEOPLE.filter(function(p){ return !usedByOthers[p]; });
+        inner.innerHTML=available.map(function(p){
+          return '<button class="dd-opt'+(answers[i]===p?' sel':'')+'" type="button" data-person="'+p+'">'+p+'</button>';
+        }).join("");
+        [].slice.call(inner.querySelectorAll(".dd-opt")).forEach(function(o){
+          o.addEventListener("click", function(){
+            var dd=item.querySelector(".dd");
+            var trigger=item.querySelector(".dd-trigger");
+            var val=item.querySelector(".dd-val");
+            answers[i]=o.getAttribute("data-person");
+            val.textContent=answers[i];
+            trigger.classList.remove("placeholder");
+            dd.classList.remove("open");
+            item.classList.remove("correct","wrong");
+            resultEl.textContent=""; resultEl.className="result";
+            updateCheckLabel();
+            refreshDropdowns();
+          });
+        });
+      });
+    }
 
     items.forEach(function(item,i){
       var dd=item.querySelector(".dd");
       var trigger=item.querySelector(".dd-trigger");
-      var val=item.querySelector(".dd-val");
-      var opts=[].slice.call(item.querySelectorAll(".dd-opt"));
-
       trigger.addEventListener("click", function(e){
         e.stopPropagation();
         var willOpen=!dd.classList.contains("open");
         closeAll(i);
         dd.classList.toggle("open", willOpen);
-      });
-
-      opts.forEach(function(o){
-        o.addEventListener("click", function(){
-          var person=o.getAttribute("data-person");
-          answers[i]=person;
-          val.textContent=person;
-          trigger.classList.remove("placeholder");
-          opts.forEach(function(x){ x.classList.toggle("sel", x===o); });
-          dd.classList.remove("open");
-          item.classList.remove("correct","wrong");
-          resultEl.textContent=""; resultEl.className="result";
-          updateCheckLabel();
-        });
       });
     });
 
@@ -591,6 +610,7 @@
       resultEl.className="result "+(correct===TOTAL?"ok":"warn");
     });
 
+    refreshDropdowns();
     return { refresh:function(){} };
   }
 

@@ -200,8 +200,15 @@
     box-shadow:0 14px 26px -12px var(--accent-soft);
   }
   .opt.is-used{opacity:.35;cursor:not-allowed;pointer-events:none;}
+  .opt.opt-bw{display:flex;align-items:center;justify-content:center;gap:6px;}
+  .opt-ltr{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+    background:var(--accent);color:#fff;
+    font-size:11px;font-weight:800;display:grid;place-items:center;
+  }
+  .opt.is-selected .opt-ltr{background:rgba(255,255,255,.3);}
 
-  /* ---------- INTERFACE 2: list + dropdown ---------- */
+  /* ---------- INTERFACE 3: list + dropdown ---------- */
   .s2-head{padding:16px 20px 10px;font-weight:800;font-size:21px;letter-spacing:-.01em;}
   .qlist{display:flex;flex-direction:column;gap:14px;padding:0 16px;}
   .qitem{
@@ -272,7 +279,7 @@
       <div class="scroll">
         <div class="lead">
           <h1>Выберите интерфейс</h1>
-          <p>Одно упражнение — два формата. Переключиться можно в любой момент.</p>
+          <p>Одно упражнение — три формата. Переключиться можно в любой момент.</p>
         </div>
         <div class="pick">
           <button class="pick-card" type="button" data-nav="screen1">
@@ -287,6 +294,14 @@
             <span class="mini"><span>2</span></span>
             <span class="pc-body">
               <span class="pc-title">Интерфейс 2</span>
+              <span class="pc-desc">Свайп по ситуациям · клик на человека — появляется буква карточки</span>
+            </span>
+            <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+          </button>
+          <button class="pick-card" type="button" data-nav="screen3">
+            <span class="mini"><span>3</span></span>
+            <span class="pc-body">
+              <span class="pc-title">Интерфейс 3</span>
               <span class="pc-desc">Все ситуации списком · выбор через выпадающее меню</span>
             </span>
             <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
@@ -331,7 +346,7 @@
       </div>
     </section>
 
-    <!-- ============ SCREEN 2: LIST + DROPDOWN ============ -->
+    <!-- ============ SCREEN 2: CAROUSEL + BADGE OPTIONS ============ -->
     <section class="screen" id="screen2">
       <div class="topbar">
         <button class="back" type="button" data-nav="chooser">
@@ -339,6 +354,42 @@
           Интерфейсы
         </button>
         <span class="tb-title">Интерфейс 2</span>
+      </div>
+      <div class="scroll">
+        <section class="player">
+          <button class="play" aria-label="Воспроизвести">
+            <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg>
+            <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1.4"/><rect x="13.5" y="5" width="4" height="14" rx="1.4"/></svg>
+          </button>
+          <div class="wave" aria-hidden="true"></div>
+          <span class="time">0:00</span>
+        </section>
+
+        <section class="block b1">
+          <h2 class="title">Что происходило</h2>
+          <div class="carousel"></div>
+          <div class="dots"></div>
+        </section>
+
+        <section class="block b2">
+          <h2 class="title">Варианты</h2>
+          <div class="options"></div>
+        </section>
+      </div>
+      <div class="footer">
+        <button class="check" type="button">Проверить</button>
+        <div class="result"></div>
+      </div>
+    </section>
+
+    <!-- ============ SCREEN 3: LIST + DROPDOWN ============ -->
+    <section class="screen" id="screen3">
+      <div class="topbar">
+        <button class="back" type="button" data-nav="chooser">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          Интерфейсы
+        </button>
+        <span class="tb-title">Интерфейс 3</span>
       </div>
       <div class="scroll">
         <section class="player">
@@ -528,8 +579,126 @@
     return { refresh:function(){ setActive(clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1)); paintOptions(); } };
   }
 
-  /* ---------------- INTERFACE 2 ---------------- */
+  /* ---------------- INTERFACE 2: carousel + letter badges ---------------- */
   function initScreen2(root){
+    var carousel = root.querySelector(".carousel");
+    var dotsWrap = root.querySelector(".dots");
+    var optsWrap = root.querySelector(".options");
+    var checkBtn = root.querySelector(".check");
+    var resultEl = root.querySelector(".result");
+    var answers={}, current=0;
+
+    carousel.innerHTML = SITUATIONS.map(function(s,i){
+      return '<article class="card" data-index="'+i+'">'
+        + '<span class="badge">'+s.letter+'<span class="tick">✓</span></span>'
+        + '<span class="glyph">'+s.icon+'</span>'
+        + '<span class="phrase">'+s.text+'</span></article>';
+    }).join("");
+    var cards=[].slice.call(carousel.querySelectorAll(".card"));
+
+    dotsWrap.innerHTML = SITUATIONS.map(function(s,i){
+      return '<button class="dot'+(i===0?' active':'')+'" aria-label="Ситуация '+(i+1)+'"></button>';
+    }).join("");
+    var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
+    dots.forEach(function(dot,i){ dot.addEventListener("click", function(){ scrollToCard(i); }); });
+
+    optsWrap.innerHTML = PEOPLE.map(function(p){
+      return '<button class="opt opt-bw" type="button" data-person="'+p+'">'
+        + '<span class="opt-name">'+p+'</span>'
+        + '<span class="opt-ltr" hidden></span>'
+        + '</button>';
+    }).join("");
+    var opts=[].slice.call(optsWrap.querySelectorAll(".opt"));
+
+    function step(){
+      if (!cards[0]) return 1;
+      var gap=parseFloat(getComputedStyle(carousel).gap)||14;
+      var w=cards[0].getBoundingClientRect().width;
+      return (w||1)+gap;
+    }
+    function scrollToCard(i){ carousel.scrollTo({ left:i*step(), behavior:"smooth" }); }
+    function paintOptions(){
+      var personToCard={};
+      Object.keys(answers).forEach(function(k){ personToCard[answers[k]]=parseInt(k,10); });
+      opts.forEach(function(btn){
+        var person=btn.getAttribute("data-person");
+        var on=answers[current]===person;
+        var cardIdx=personToCard[person];
+        btn.classList.toggle("is-selected", on);
+        var ltr=btn.querySelector(".opt-ltr");
+        if (cardIdx!==undefined){ ltr.textContent=SITUATIONS[cardIdx].letter; ltr.hidden=false; }
+        else { ltr.hidden=true; }
+        btn.setAttribute("aria-pressed", on?"true":"false");
+      });
+    }
+    function setActive(i){
+      if (i===current){ paintOptions(); return; }
+      current=i;
+      dots.forEach(function(d,n){ d.classList.toggle("active", n===i); });
+      paintOptions();
+    }
+    function updateCheckLabel(){
+      var n=Object.keys(answers).length;
+      checkBtn.textContent=(n>0&&n<TOTAL)?("Проверить · "+n+"/"+TOTAL):"Проверить";
+    }
+
+    opts.forEach(function(btn){
+      btn.setAttribute("aria-pressed","false");
+      btn.addEventListener("click", function(){
+        var person=btn.getAttribute("data-person");
+        if (answers[current]===person){
+          delete answers[current];
+          cards[current].classList.remove("answered","correct","wrong");
+          resultEl.textContent=""; resultEl.className="result";
+          paintOptions(); updateCheckLabel(); return;
+        }
+        Object.keys(answers).forEach(function(k){
+          if (answers[k]===person){
+            delete answers[k];
+            cards[parseInt(k,10)].classList.remove("answered","correct","wrong");
+          }
+        });
+        answers[current]=person;
+        cards[current].classList.add("answered");
+        cards[current].classList.remove("correct","wrong");
+        resultEl.textContent=""; resultEl.className="result";
+        paintOptions(); updateCheckLabel();
+        if (Object.keys(answers).length<TOTAL){
+          for (var k=1;k<=TOTAL;k++){
+            var nx=(current+k)%TOTAL;
+            if (answers[nx]===undefined){ (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx); break; }
+          }
+        }
+      });
+    });
+
+    var raf=null;
+    carousel.addEventListener("scroll", function(){
+      if (raf) return;
+      raf=requestAnimationFrame(function(){
+        raf=null;
+        setActive(clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1));
+      });
+    }, {passive:true});
+
+    checkBtn.addEventListener("click", function(){
+      if (Object.keys(answers).length<TOTAL){
+        checkBtn.classList.remove("shake"); void checkBtn.offsetWidth; checkBtn.classList.add("shake");
+        resultEl.textContent="Ответьте на все ситуации"; resultEl.className="result warn"; return;
+      }
+      var correct=0;
+      cards.forEach(function(card,i){
+        var ok=answers[i]===SITUATIONS[i].answer; if (ok) correct++;
+        card.classList.toggle("correct", ok); card.classList.toggle("wrong", !ok);
+      });
+      resultEl.textContent=(correct===TOTAL)?"Отлично! Все ответы верны 🎉":("Верно: "+correct+" из "+TOTAL);
+      resultEl.className="result "+(correct===TOTAL?"ok":"warn");
+    });
+
+    return { refresh:function(){ setActive(clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1)); paintOptions(); } };
+  }
+
+  function initScreen3(root){
     var qlist   = root.querySelector(".qlist");
     var checkBtn= root.querySelector(".check");
     var resultEl= root.querySelector(".result");
@@ -624,9 +793,11 @@
   /* ---------------- navigation ---------------- */
   var screen1El=document.getElementById("screen1");
   var screen2El=document.getElementById("screen2");
+  var screen3El=document.getElementById("screen3");
   var s1=initScreen1(screen1El);
   var s2=initScreen2(screen2El);
-  players.push(initPlayer(screen1El), initPlayer(screen2El));
+  var s3=initScreen3(screen3El);
+  players.push(initPlayer(screen1El), initPlayer(screen2El), initPlayer(screen3El));
 
   function showScreen(id){
     stopAllPlayers();
@@ -635,6 +806,7 @@
     el.classList.add("active");
     var sc=el.querySelector(".scroll"); if (sc) sc.scrollTop=0;
     if (id==="screen1") s1.refresh();
+    if (id==="screen2") s2.refresh();
   }
 
   [].slice.call(document.querySelectorAll("[data-nav]")).forEach(function(btn){

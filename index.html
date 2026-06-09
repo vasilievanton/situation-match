@@ -804,16 +804,11 @@
     function scrollToCard(i){ carousel.scrollTo({ left:i*step(), behavior:"smooth" }); }
     function paintOptions(){
       var chosen=answers[current];
-      var usedElsewhere={};
-      Object.keys(answers).forEach(function(k){
-        if (parseInt(k,10)!==current) usedElsewhere[answers[k]]=true;
-      });
       opts.forEach(function(btn){
         var person=btn.getAttribute("data-person");
         var on=person===chosen;
-        var used=!on && !!usedElsewhere[person];
         btn.classList.toggle("is-selected", on);
-        btn.classList.toggle("is-used", used);
+        btn.classList.remove("is-used");
         btn.setAttribute("aria-pressed", on?"true":"false");
       });
     }
@@ -838,6 +833,12 @@
           resultEl.textContent=""; resultEl.className="result";
           paintOptions(); updateCheckLabel(); return;
         }
+        Object.keys(answers).forEach(function(k){
+          if (answers[k]===person){
+            delete answers[k];
+            cards[parseInt(k,10)].classList.remove("answered","correct","wrong");
+          }
+        });
         answers[current]=person;
         cards[current].classList.add("answered");
         cards[current].classList.remove("correct","wrong");

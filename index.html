@@ -549,7 +549,7 @@
       b.style.animationDelay=(i*.035).toFixed(2)+"s";
       wave.appendChild(b); bars.push(b);
     }
-    var DURATION=120,cur=0,timer=null;
+    var DURATION=5,cur=0,timer=null;
     function paint(){
       var played=Math.round(cur/DURATION*BARS);
       for(var i=0;i<BARS;i++) bars[i].classList.toggle("played",i<played);

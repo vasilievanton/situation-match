@@ -292,7 +292,7 @@
   .result.warn{color:var(--play);}
   .result.info{color:var(--ink-2);}
   .scroll-cue{
-    position:absolute;left:50%;z-index:40;
+    position:fixed;left:50%;top:0;z-index:80;
     display:inline-flex;align-items:center;gap:6px;
     border:1px solid rgba(29,32,35,.08);border-radius:999px;
     padding:8px 13px 8px 14px;background:rgba(255,255,255,.94);
@@ -705,14 +705,17 @@
       var footer=root.querySelector(".footer");
       var footerVisible=footer&&getComputedStyle(footer).display!=="none";
       var vv=window.visualViewport;
-      var hiddenByBrowser=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;
       var visualBottom=vv?(vv.offsetTop+vv.height):window.innerHeight;
+      var visualLeft=vv?vv.offsetLeft:0;
+      var visualWidth=vv?vv.width:window.innerWidth;
       var rootBottom=root.getBoundingClientRect().bottom;
-      var bottom=(footerVisible?footer.offsetHeight:0)+10+hiddenByBrowser;
+      var footerHeight=footerVisible?footer.offsetHeight:0;
       var scrollRemaining=sc.scrollHeight-sc.clientHeight-sc.scrollTop;
       var clippedByViewport=rootBottom-visualBottom>24;
       var hasMore=scrollRemaining>12||clippedByViewport;
-      cue.style.bottom=bottom+"px";
+      var cueTop=Math.max(72,visualBottom-footerHeight-76);
+      cue.style.left=(visualLeft+visualWidth/2)+"px";
+      cue.style.top=cueTop+"px";
       cue.classList.toggle("show",root.classList.contains("active")&&hasMore);
     }
     cue.onclick=function(){sc.scrollBy({top:Math.max(180,sc.clientHeight*.55),behavior:"smooth"});};

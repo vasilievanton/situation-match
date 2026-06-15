@@ -139,7 +139,12 @@
   .card.answered{outline-color:var(--accent);}
   .card.correct{outline-color:var(--ok);}
   .card.wrong{outline-color:var(--err);}
-  .card.is-active{background:rgba(108,77,242,.05);}
+  .card.is-active{background:rgba(108,77,242,.04);}
+  .card.is-sel{
+    outline-color:var(--accent)!important;
+    box-shadow:0 0 0 4px var(--accent-soft),0 16px 36px -20px rgba(50,35,110,.3);
+    background:rgba(108,77,242,.06);
+  }
   .badge{
     position:absolute;top:16px;left:16px;width:38px;height:38px;border-radius:50%;
     background:linear-gradient(135deg,var(--accent-2),var(--accent));
@@ -169,6 +174,9 @@
   .opt.is-selected{
     background:linear-gradient(135deg,var(--accent-2),var(--accent));color:#fff;border-color:transparent;
     box-shadow:0 14px 26px -12px var(--accent-soft);
+  }
+  .opt.is-used{
+    background:var(--surface-2);color:var(--muted);border-color:transparent;box-shadow:none;opacity:.45;
   }
 
   /* ---------- SCREEN 2: flip cards (6-9) ---------- */
@@ -744,7 +752,7 @@
     var optsWrap=root.querySelector(".options");
     var checkBtn=root.querySelector(".check");
     var resultEl=root.querySelector(".result");
-    var answers={}, current=0;
+    var answers={}, current=0, selectedCard=null;
 
     carousel.innerHTML=SITUATIONS.map(function(s,i){
       return '<article class="card" data-index="'+i+'">'
@@ -771,49 +779,76 @@
       return (cards[0].getBoundingClientRect().width||1)+gap;
     }
     function scrollToCard(i){ carousel.scrollTo({left:i*step(),behavior:"smooth"}); }
-    function paintOptions(){
-      var chosen=answers[current];
-      opts.forEach(function(btn){
-        var on=btn.getAttribute("data-person")===chosen;
-        btn.classList.toggle("is-selected",on);
-        btn.classList.remove("is-used");
-        btn.setAttribute("aria-pressed",on?"true":"false");
+
+    function paintCards(){
+      cards.forEach(function(c,i){
+        c.classList.toggle("is-active", i===current && i!==selectedCard);
+        c.classList.toggle("is-sel", i===selectedCard);
+        c.classList.toggle("answered", answers[i]!==undefined);
       });
     }
-    function setActive(i){
-      if(i===current){ paintOptions(); return; }
-      current=i;
-      dots.forEach(function(d,n){ d.classList.toggle("active",n===i); });
-      paintOptions();
+    function paintOptions(){
+      opts.forEach(function(btn){
+        var p=btn.getAttribute("data-person");
+        var isSelected=selectedCard!==null && answers[selectedCard]===p;
+        var isUsed=!isSelected && (function(){
+          var u=false;
+          Object.keys(answers).forEach(function(k){ if(answers[k]===p) u=true; });
+          return u;
+        })();
+        btn.classList.toggle("is-selected",isSelected);
+        btn.classList.toggle("is-used",isUsed);
+        btn.setAttribute("aria-pressed",isSelected?"true":"false");
+      });
     }
     function updateCheckLabel(){
       var n=Object.keys(answers).length;
       checkBtn.textContent=(n>0&&n<TOTAL)?("Проверить · "+n+"/"+TOTAL):"Проверить";
     }
 
+    cards.forEach(function(c,i){
+      c.style.cursor="pointer";
+      c.addEventListener("click",function(){
+        selectedCard=(selectedCard===i)?null:i;
+        if(selectedCard!==null && i!==current){ scrollToCard(i); }
+        paintCards(); paintOptions();
+      });
+    });
+
     opts.forEach(function(btn){
       btn.setAttribute("aria-pressed","false");
       btn.addEventListener("click",function(){
+        if(selectedCard===null){
+          checkBtn.classList.remove("shake"); void checkBtn.offsetWidth; checkBtn.classList.add("shake");
+          return;
+        }
         var p=btn.getAttribute("data-person");
-        if(answers[current]===p){
-          delete answers[current];
-          cards[current].classList.remove("answered","correct","wrong");
+        if(answers[selectedCard]===p){
+          delete answers[selectedCard];
+          cards[selectedCard].classList.remove("answered","correct","wrong");
           resultEl.textContent=""; resultEl.className="result";
-          paintOptions(); updateCheckLabel(); return;
+          paintCards(); paintOptions(); updateCheckLabel(); return;
         }
         Object.keys(answers).forEach(function(k){
           if(answers[k]===p){ delete answers[k]; cards[parseInt(k,10)].classList.remove("answered","correct","wrong"); }
         });
-        answers[current]=p;
-        cards[current].classList.add("answered"); cards[current].classList.remove("correct","wrong");
+        answers[selectedCard]=p;
+        cards[selectedCard].classList.add("answered"); cards[selectedCard].classList.remove("correct","wrong");
         resultEl.textContent=""; resultEl.className="result";
-        paintOptions(); updateCheckLabel();
+        var prev=selectedCard;
         if(Object.keys(answers).length<TOTAL){
           for(var k=1;k<=TOTAL;k++){
-            var nx=(current+k)%TOTAL;
-            if(answers[nx]===undefined){ (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx); break; }
+            var nx=(prev+k)%TOTAL;
+            if(answers[nx]===undefined){
+              selectedCard=nx;
+              (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx);
+              break;
+            }
           }
+        } else {
+          selectedCard=null;
         }
+        paintCards(); paintOptions(); updateCheckLabel();
       });
     });
 
@@ -822,7 +857,13 @@
       if(raf) return;
       raf=requestAnimationFrame(function(){
         raf=null;
-        setActive(clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1));
+        var i=clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1);
+        if(i!==current){
+          current=i;
+          selectedCard=i;
+          dots.forEach(function(d,n){ d.classList.toggle("active",n===i); });
+          paintCards(); paintOptions();
+        }
       });
     },{passive:true});
 
@@ -840,7 +881,11 @@
       resultEl.className="result "+(correct===TOTAL?"ok":"warn");
     });
 
-    return { refresh:function(){ setActive(clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1)); paintOptions(); } };
+    return { refresh:function(){
+      current=clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1);
+      dots.forEach(function(d,n){ d.classList.toggle("active",n===current); });
+      paintCards(); paintOptions();
+    }};
   }
 
   /* ---------------- navigation ---------------- */

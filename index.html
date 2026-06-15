@@ -261,6 +261,48 @@
   @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 
+  /* ---------- step bar ---------- */
+  .step-bar{display:flex;justify-content:center;gap:10px;padding:14px 20px 2px;}
+  .step-dot{
+    width:34px;height:34px;border-radius:50%;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:14px;
+    background:var(--surface-2);color:var(--muted);
+    transition:background .25s ease,color .25s ease;
+  }
+  .step-dot.done{background:var(--ok);color:#fff;}
+  .step-dot.active{background:var(--ink);color:#fff;}
+
+  /* ---------- pic cards (3–5) ---------- */
+  .pic-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 20px 4px;}
+  .pic-card{
+    display:flex;flex-direction:column;align-items:center;
+    background:#fff;border:2.5px solid transparent;border-radius:22px;
+    padding:0;cursor:pointer;font-family:inherit;overflow:hidden;
+    box-shadow:0 8px 24px -14px rgba(50,35,110,.25);
+    transition:border-color .2s ease,box-shadow .2s ease,transform .12s ease;
+  }
+  .pic-card:active{transform:scale(.96);}
+  .pic-card.is-picked{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft),0 8px 24px -14px rgba(50,35,110,.25);}
+  .pic-img-area{
+    width:100%;aspect-ratio:1;background:var(--pic-bg,var(--surface-2));
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .pic-ltr{
+    position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    color:#fff;font-weight:800;font-size:12px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pic-emoji{font-size:56px;line-height:1;}
+  .pic-desc{font-size:12.5px;color:var(--ink-2);font-weight:600;padding:10px 8px;text-align:center;line-height:1.3;}
+
+  /* ---------- situation card (6–9) ---------- */
+  .sit-card{margin:8px 20px;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 8px 24px -14px rgba(50,35,110,.25);}
+  .sit-illus{font-size:72px;text-align:center;padding:24px 20px 16px;line-height:1;}
+  .sit-text{font-size:15px;line-height:1.65;color:var(--ink-2);padding:0 20px 20px;margin:0;}
+  .opts-col{grid-template-columns:1fr;}
+
   /* ---------- intro modal ---------- */
   .intro-modal{
     position:absolute;inset:0;z-index:50;
@@ -373,18 +415,13 @@
         <span class="tb-title">3–5 лет</span>
       </div>
       <div class="scroll">
-        <section class="block b1">
-          <h2 class="title">Что происходило</h2>
-          <div class="match-grid" id="sit-grid"></div>
-        </section>
-        <div class="match-sep"></div>
-        <section class="block b2">
-          <h2 class="title">Кто это делал</h2>
-          <div class="match-grid" id="per-grid"></div>
-        </section>
+        <div class="step-bar" id="s1-steps"></div>
+        <h2 class="title">Выбери картинку и эмоцию к ней</h2>
+        <div class="pic-pair" id="s1-pics"></div>
+        <div class="options" id="s1-opts"></div>
       </div>
       <div class="footer">
-        <button class="check" type="button">Проверить</button>
+        <button class="check" type="button" id="s1-next" disabled>Далее</button>
         <div class="result"></div>
       </div>
     </section>
@@ -399,18 +436,13 @@
         <span class="tb-title">6–9 лет</span>
       </div>
       <div class="scroll">
-        <section class="block b1">
-          <h2 class="title">Что происходило</h2>
-          <div class="carousel"></div>
-          <div class="dots"></div>
-        </section>
-        <section class="block b2">
-          <h2 class="title">Варианты</h2>
-          <div class="options"></div>
-        </section>
+        <div class="step-bar" id="s2-steps"></div>
+        <h2 class="title">Выбери ситуацию и эмоцию к ней</h2>
+        <div class="sit-card" id="s2-sit"></div>
+        <div class="options opts-col" id="s2-opts"></div>
       </div>
       <div class="footer">
-        <button class="check" type="button">Проверить</button>
+        <button class="check" type="button" id="s2-next" disabled>Далее</button>
         <div class="result"></div>
       </div>
     </section>
@@ -556,6 +588,22 @@
     "Лера":"👩","Тёма":"🧒","Девушка с фотоаппаратом":"📷"
   };
 
+  var STEPS_3_5 = [
+    { pairBg:["#fce8ef","#fef3e2"], pics:[{id:"A",emoji:"🤗",desc:"Обнимает"},{id:"B",emoji:"😄",desc:"Смеётся"}],       emotions:["Доброта","Игривость","Любовь","Гордость"] },
+    { pairBg:["#e8f4ff","#fff3e8"], pics:[{id:"A",emoji:"😤",desc:"Сердится"},{id:"B",emoji:"😊",desc:"Доволен"}],        emotions:["Злость","Радость","Обида","Спокойствие"] },
+    { pairBg:["#e8effc","#fce8ef"], pics:[{id:"A",emoji:"😢",desc:"Плачет"},{id:"B",emoji:"😟",desc:"Переживает"}],      emotions:["Грусть","Тревога","Страх","Одиночество"] },
+    { pairBg:["#fff3e8","#e8fcef"], pics:[{id:"A",emoji:"😁",desc:"Гордится"},{id:"B",emoji:"🤩",desc:"Восхищается"}],   emotions:["Гордость","Восторг","Радость","Удивление"] },
+    { pairBg:["#e8fcef","#e8f4ff"], pics:[{id:"A",emoji:"😨",desc:"Испугался"},{id:"B",emoji:"😏",desc:"Озорничает"}],  emotions:["Страх","Игривость","Смущение","Беспокойство"] }
+  ];
+
+  var STEPS_6_9 = [
+    { icon:"🏃", bg:"#e8effc", situation:"Ты играешь с ребятами во дворе. Вдруг к вам подходят дети постарше. Один мальчик начинает дразнить твоего друга и толкает его плечом. У тебя внутри будто всё закипает. Хочется защитить друга и остановить обидчика.", emotions:["Злость","Страх","Доброта"] },
+    { icon:"🎁", bg:"#fef3e2", situation:"Тебе подарили на день рождения именно то, о чём ты давно мечтал. Ты держишь подарок в руках и не можешь поверить, что это правда. Сердце быстро бьётся от счастья.",                                                          emotions:["Радость","Удивление","Благодарность"] },
+    { icon:"🏫", bg:"#fce8ef", situation:"Ты пришёл в новый класс. Все ребята уже знакомы друг с другом, а ты никого не знаешь. Ты стоишь у двери и не знаешь, куда сесть.",                                                                                          emotions:["Страх","Одиночество","Смущение"] },
+    { icon:"🐶", bg:"#e8fcef", situation:"Твой любимый питомец заболел. Ты видишь, что ему плохо, и ничем не можешь помочь. Внутри становится тяжело и хочется плакать.",                                                                                              emotions:["Грусть","Тревога","Нежность"] },
+    { icon:"🏆", bg:"#e8f4ff", situation:"Ты долго тренировался и наконец выиграл соревнование. Тренер пожимает тебе руку, а друзья хлопают в ладоши. Ты чувствуешь, что всё получилось.",                                                                            emotions:["Гордость","Радость","Облегчение"] }
+  ];
+
   var TOTAL = SITUATIONS.length;
 
   function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
@@ -599,226 +647,133 @@
   var doneTitle=document.getElementById("done-title");
   var doneScore=document.getElementById("done-score");
   document.getElementById("done-close").addEventListener("click",function(){ doneModal.classList.add("gone"); });
-  function showDoneModal(correct,total){
+  function showDoneModal(correct,total,msg){
     var all=correct===total;
     doneIcon.textContent=all?"🎉":"💪";
     doneTitle.textContent=all?"Отлично!":"Почти получилось";
-    doneScore.textContent=all?("Все "+total+" ответа верны"):("Верно "+correct+" из "+total);
+    doneScore.textContent=msg||(all?"Все ответы верны":("Верно "+correct+" из "+total));
     doneModal.classList.remove("gone");
   }
 
   /* ============================================================
-     SCREEN 1 — 3–5 лет: matching game
+     SCREEN 1 — 3–5 лет: картинка + эмоция
      ============================================================ */
   function initScreen1(root){
-    var sitGrid=root.querySelector("#sit-grid");
-    var perGrid=root.querySelector("#per-grid");
-    var checkBtn=root.querySelector(".check");
-    var resultEl=root.querySelector(".result");
-    var answers={}, selected=null;
+    var stepsEl=root.querySelector("#s1-steps");
+    var picsEl=root.querySelector("#s1-pics");
+    var optsEl=root.querySelector("#s1-opts");
+    var nextBtn=root.querySelector("#s1-next");
+    var N=STEPS_3_5.length;
+    var step=0, pickedPic=null, pickedEmo=null;
 
-    sitGrid.innerHTML=SITUATIONS.map(function(s,i){
-      return '<article class="match-card" data-index="'+i+'">'
-        +'<span class="sit-ltr">'+s.letter+'<span class="sit-tick">✓</span></span>'
-        +'<span class="match-emoji">'+s.icon+'</span>'
-        +'</article>';
-    }).join("");
-    var sitCards=[].slice.call(sitGrid.querySelectorAll(".match-card"));
-
-    perGrid.innerHTML=PEOPLE.map(function(p){
-      var em=PEOPLE_EMOJI[p]||"👤";
-      var label=p.length>8?p.split(" ")[0]:p;
-      return '<button class="match-card" type="button" data-person="'+p+'">'
-        +'<span class="match-emoji sm">'+em+'</span>'
-        +'<span class="match-label">'+label+'</span>'
-        +'</button>';
-    }).join("");
-    var perCards=[].slice.call(perGrid.querySelectorAll(".match-card"));
-
-    function paintSit(){
-      sitCards.forEach(function(c,i){
-        c.classList.toggle("is-active", i===selected);
-        c.classList.toggle("answered", answers[i]!==undefined);
-      });
+    function renderSteps(){
+      stepsEl.innerHTML=STEPS_3_5.map(function(_,i){
+        var cls=i<step?"done":i===step?"active":"";
+        return '<span class="step-dot '+cls+'">'+(i<step?"✓":(i+1))+"</span>";
+      }).join("");
     }
-    function paintPer(){
-      perCards.forEach(function(c){
-        var p=c.getAttribute("data-person");
-        c.classList.toggle("is-selected", selected!==null && answers[selected]===p);
-      });
-    }
-    function updateCheckLabel(){
-      var n=Object.keys(answers).length;
-      if(n===TOTAL){ checkBtn.textContent="Проверить"; checkBtn.disabled=false; }
-      else { checkBtn.textContent=(n>0)?("Выбрано "+n+" из "+TOTAL):"Проверить"; checkBtn.disabled=true; }
-    }
-
-    sitCards.forEach(function(c,i){
-      c.addEventListener("click",function(){
-        selected=(selected===i)?null:i;
-        paintSit(); paintPer();
-      });
-    });
-
-    perCards.forEach(function(c){
-      c.addEventListener("click",function(){
-        if(selected===null){
-          checkBtn.classList.remove("shake"); void checkBtn.offsetWidth; checkBtn.classList.add("shake");
-          return;
-        }
-        var p=c.getAttribute("data-person");
-        if(answers[selected]===p){
-          delete answers[selected];
-          sitCards[selected].classList.remove("correct","wrong");
-          resultEl.textContent=""; resultEl.className="result";
-          paintSit(); paintPer(); updateCheckLabel(); return;
-        }
-        Object.keys(answers).forEach(function(k){
-          if(answers[k]===p){ delete answers[k]; sitCards[parseInt(k,10)].classList.remove("correct","wrong"); }
+    function renderPics(){
+      var s=STEPS_3_5[step];
+      picsEl.innerHTML=s.pics.map(function(p,idx){
+        return '<button class="pic-card" type="button" data-pic="'+p.id+'" style="--pic-bg:'+s.pairBg[idx]+'">'
+          +'<div class="pic-img-area"><span class="pic-ltr">'+p.id+'</span><span class="pic-emoji">'+p.emoji+'</span></div>'
+          +'<span class="pic-desc">'+p.desc+'</span>'
+          +'</button>';
+      }).join("");
+      [].slice.call(picsEl.querySelectorAll(".pic-card")).forEach(function(btn){
+        btn.addEventListener("click",function(){
+          pickedPic=btn.getAttribute("data-pic");
+          [].slice.call(picsEl.querySelectorAll(".pic-card")).forEach(function(b){
+            b.classList.toggle("is-picked",b.getAttribute("data-pic")===pickedPic);
+          });
+          updateNext();
         });
-        answers[selected]=p;
-        sitCards[selected].classList.remove("correct","wrong");
-        resultEl.textContent=""; resultEl.className="result";
-        paintSit(); paintPer(); updateCheckLabel();
-        if(Object.keys(answers).length<TOTAL){
-          for(var k=1;k<=TOTAL;k++){
-            var nx=(selected+k)%TOTAL;
-            if(answers[nx]===undefined){ selected=nx; paintSit(); paintPer(); break; }
-          }
-        }
       });
+    }
+    function renderOpts(){
+      var s=STEPS_3_5[step];
+      optsEl.innerHTML=s.emotions.map(function(e){
+        return '<button class="opt" type="button" data-emo="'+e+'">'+e+'</button>';
+      }).join("");
+      [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(btn){
+        btn.addEventListener("click",function(){
+          pickedEmo=btn.getAttribute("data-emo");
+          [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(b){
+            b.classList.toggle("is-selected",b.getAttribute("data-emo")===pickedEmo);
+          });
+          updateNext();
+        });
+      });
+    }
+    function updateNext(){
+      nextBtn.disabled=!(pickedPic&&pickedEmo);
+      nextBtn.textContent=(step===N-1)?"Завершить":"Далее";
+    }
+    function render(){
+      pickedPic=null; pickedEmo=null;
+      renderSteps(); renderPics(); renderOpts(); updateNext();
+    }
+
+    nextBtn.addEventListener("click",function(){
+      if(step<N-1){ step++; render(); root.querySelector(".scroll").scrollTop=0; }
+      else { showDoneModal(N,N,"Ты ответил на все вопросы"); }
     });
 
-    checkBtn.addEventListener("click",function(){
-      var correct=0;
-      sitCards.forEach(function(c,i){
-        var ok=answers[i]===SITUATIONS[i].answer; if(ok) correct++;
-        c.classList.toggle("correct",ok); c.classList.toggle("wrong",!ok);
-      });
-      showDoneModal(correct,TOTAL);
-    });
-
-    updateCheckLabel();
-    return { refresh:function(){ paintSit(); paintPer(); updateCheckLabel(); } };
+    render();
+    return { refresh:function(){ step=0; render(); } };
   }
 
   /* ============================================================
-     SCREEN 2 — 6–9 лет: flip cards + options
+     SCREEN 2 — 6–9 лет: ситуация + эмоция
      ============================================================ */
   function initScreen2(root){
-    var carousel=root.querySelector(".carousel");
-    var dotsWrap=root.querySelector(".dots");
-    var optsWrap=root.querySelector(".options");
-    var checkBtn=root.querySelector(".check");
-    var resultEl=root.querySelector(".result");
-    var answers={}, current=0;
+    var stepsEl=root.querySelector("#s2-steps");
+    var sitEl=root.querySelector("#s2-sit");
+    var optsEl=root.querySelector("#s2-opts");
+    var nextBtn=root.querySelector("#s2-next");
+    var N=STEPS_6_9.length;
+    var step=0, pickedEmo=null;
 
-    carousel.innerHTML=SITUATIONS_6_9.map(function(s,i){
-      return '<div class="flip-wrap" data-index="'+i+'">'
-        +'<div class="flip-inner">'
-        +'<div class="flip-front">'
-        +'<span class="badge">'+s.letter+'<span class="tick">✓</span></span>'
-        +'<span class="glyph">'+s.icon+'</span>'
-        +'<span class="phrase">'+s.text+'</span>'
-        +'<span class="flip-hint">Нажми, чтобы узнать больше →</span>'
-        +'</div>'
-        +'<div class="flip-back">'
-        +'<span class="badge">'+s.letter+'<span class="tick">✓</span></span>'
-        +'<p class="flip-desc">'+s.desc+'</p>'
-        +'</div>'
-        +'</div></div>';
-    }).join("");
-    var wraps=[].slice.call(carousel.querySelectorAll(".flip-wrap"));
-
-    dotsWrap.innerHTML=SITUATIONS_6_9.map(function(s,i){
-      return '<button class="dot'+(i===0?' active':'')+'" aria-label="Ситуация '+(i+1)+'"></button>';
-    }).join("");
-    var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
-    dots.forEach(function(dot,i){ dot.addEventListener("click",function(){ scrollToCard(i); }); });
-
-    optsWrap.innerHTML=PEOPLE.map(function(p){
-      return '<button class="opt" type="button" data-person="'+p+'">'+p+'</button>';
-    }).join("");
-    var opts=[].slice.call(optsWrap.querySelectorAll(".opt"));
-
-    function step(){
-      if(!wraps[0]) return 1;
-      var gap=parseFloat(getComputedStyle(carousel).gap)||14;
-      return (wraps[0].getBoundingClientRect().width||1)+gap;
+    function renderSteps(){
+      stepsEl.innerHTML=STEPS_6_9.map(function(_,i){
+        var cls=i<step?"done":i===step?"active":"";
+        return '<span class="step-dot '+cls+'">'+(i<step?"✓":(i+1))+"</span>";
+      }).join("");
     }
-    function scrollToCard(i){ carousel.scrollTo({left:i*step(),behavior:"smooth"}); }
-    function paintOptions(){
-      var chosen=answers[current];
-      opts.forEach(function(btn){
-        var on=btn.getAttribute("data-person")===chosen;
-        btn.classList.toggle("is-selected",on);
-        btn.classList.remove("is-used");
-        btn.setAttribute("aria-pressed",on?"true":"false");
-      });
+    function renderSit(){
+      var s=STEPS_6_9[step];
+      sitEl.innerHTML='<div class="sit-illus" style="background:'+s.bg+'">'+s.icon+'</div>'
+        +'<p class="sit-text">'+s.situation+'</p>';
     }
-    function setActive(i){
-      if(i===current) return;
-      wraps[current].classList.remove("flipped");
-      current=i;
-      dots.forEach(function(d,n){ d.classList.toggle("active",n===i); });
-      paintOptions();
-    }
-    function updateCheckLabel(){
-      var n=Object.keys(answers).length;
-      if(n===TOTAL){ checkBtn.textContent="Проверить"; checkBtn.disabled=false; }
-      else { checkBtn.textContent=(n>0)?("Выбрано "+n+" из "+TOTAL):"Проверить"; checkBtn.disabled=true; }
-    }
-
-    wraps.forEach(function(wrap){
-      wrap.addEventListener("click",function(){ wrap.classList.toggle("flipped"); });
-    });
-
-    opts.forEach(function(btn){
-      btn.setAttribute("aria-pressed","false");
-      btn.addEventListener("click",function(){
-        var p=btn.getAttribute("data-person");
-        if(answers[current]===p){
-          delete answers[current];
-          wraps[current].classList.remove("answered","correct","wrong");
-          resultEl.textContent=""; resultEl.className="result";
-          paintOptions(); updateCheckLabel(); return;
-        }
-        Object.keys(answers).forEach(function(k){
-          if(answers[k]===p){ delete answers[k]; wraps[parseInt(k,10)].classList.remove("answered","correct","wrong"); }
+    function renderOpts(){
+      var s=STEPS_6_9[step];
+      optsEl.innerHTML=s.emotions.map(function(e){
+        return '<button class="opt" type="button" data-emo="'+e+'">'+e+'</button>';
+      }).join("");
+      [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(btn){
+        btn.addEventListener("click",function(){
+          pickedEmo=btn.getAttribute("data-emo");
+          [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(b){
+            b.classList.toggle("is-selected",b.getAttribute("data-emo")===pickedEmo);
+          });
+          nextBtn.disabled=false;
         });
-        answers[current]=p;
-        wraps[current].classList.add("answered"); wraps[current].classList.remove("correct","wrong");
-        resultEl.textContent=""; resultEl.className="result";
-        paintOptions(); updateCheckLabel();
-        if(Object.keys(answers).length<TOTAL){
-          for(var k=1;k<=TOTAL;k++){
-            var nx=(current+k)%TOTAL;
-            if(answers[nx]===undefined){ (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx); break; }
-          }
-        }
       });
+    }
+    function render(){
+      pickedEmo=null;
+      renderSteps(); renderSit(); renderOpts();
+      nextBtn.disabled=true;
+      nextBtn.textContent=(step===N-1)?"Завершить":"Далее";
+    }
+
+    nextBtn.addEventListener("click",function(){
+      if(step<N-1){ step++; render(); root.querySelector(".scroll").scrollTop=0; }
+      else { showDoneModal(N,N,"Ты ответил на все вопросы"); }
     });
 
-    var raf=null;
-    carousel.addEventListener("scroll",function(){
-      if(raf) return;
-      raf=requestAnimationFrame(function(){
-        raf=null;
-        setActive(clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1));
-      });
-    },{passive:true});
-
-    checkBtn.addEventListener("click",function(){
-      var correct=0;
-      wraps.forEach(function(w,i){
-        var ok=answers[i]===SITUATIONS_6_9[i].answer; if(ok) correct++;
-        w.classList.toggle("correct",ok); w.classList.toggle("wrong",!ok);
-      });
-      showDoneModal(correct,TOTAL);
-    });
-
-    updateCheckLabel();
-    return { refresh:function(){ current=clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1); dots.forEach(function(d,n){ d.classList.toggle("active",n===current); }); paintOptions(); updateCheckLabel(); } };
+    render();
+    return { refresh:function(){ step=0; render(); } };
   }
 
   /* ============================================================

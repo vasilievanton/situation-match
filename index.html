@@ -676,7 +676,7 @@
         checked=true;
         taskCorrects[step]=task.items.filter(function(it){return task.answer_key[it.id]===answers[it.id];}).length;
         rePics();
-        setResult(root,"Проверили. Можно перейти дальше.","info");
+        setResult(root,"Верно "+taskCorrects[step]+" из "+task.items.length,"info");
         nextBtn.textContent=step<N-1?"Далее":"Завершить";nextBtn.disabled=false;
         nextBtn.onclick=function(){
           if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
@@ -765,7 +765,7 @@
         checked=true;
         taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
         paintCards();
-        setResult(root,"Проверили. Можно идти дальше.","info");
+        setResult(root,"Верно "+taskCorrects[step]+" из "+TOTAL,"info");
         checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
         checkBtn.onclick=function(){
           if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
@@ -916,7 +916,7 @@
           checked=true;
           taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
           paintCards();
-          setResult(root,"Проверили. Можно продолжить.","info");
+          setResult(root,"Верно "+taskCorrects[step]+" из "+TOTAL,"info");
           checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
           checkBtn.onclick=function(){
             if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}

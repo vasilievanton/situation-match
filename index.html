@@ -239,7 +239,13 @@
   .flip-wrap.correct .flip-front,.flip-wrap.correct .flip-back{outline-color:var(--ok);}
   .flip-wrap.wrong .flip-front,.flip-wrap.wrong .flip-back{outline-color:var(--err);}
   .flip-wrap.answered .flip-front .badge .tick{display:grid;}
-  .flip-hint{font-size:12px;color:var(--muted);font-weight:500;}
+  .flip-hint{
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:"MTS Wide",sans-serif;font-size:12px;color:#fff;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;
+    background:var(--accent);border-radius:999px;
+    box-shadow:0 8px 20px -8px rgba(255,0,50,.45);
+  }
   .flip-ico{font-size:52px;line-height:1;}
   .flip-word{font-family:"MTS Wide",sans-serif;font-size:17px;font-weight:700;text-align:center;color:var(--ink);}
   .flip-desc{font-size:14px;line-height:1.6;color:var(--ink-2);text-align:center;}
@@ -416,7 +422,7 @@
   .flip-front-img{padding:0;justify-content:flex-start;overflow:hidden;}
   .flip-front-img .badge{z-index:1;}
   .flip-img{width:100%;flex:1;min-height:100px;object-fit:cover;display:block;}
-  .flip-front-img .flip-hint{padding:10px 16px 14px;width:100%;text-align:center;box-sizing:border-box;}
+  .flip-front-img .flip-hint{margin:10px auto 14px;padding:9px 14px;text-align:center;box-sizing:border-box;}
   /* ── skip button ───────────────────────────────────────────── */
   .skip-btn{border:none;background:transparent;color:var(--muted);font-family:"MTS Compact",sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px;white-space:nowrap;flex-shrink:0;text-decoration:underline;text-underline-offset:2px;}
   .skip-btn:hover{color:var(--accent);}
@@ -790,7 +796,7 @@
       renderSteps();
       setResult(root,"","");
       carousel.innerHTML=items.map(function(item,i){
-        return '<div class="flip-wrap" data-index="'+i+'"><div class="flip-inner"><div class="flip-front flip-front-img"><div class="badge">'+item.id+'<span class="tick">✓</span></div><img class="flip-img" src="'+item.image+'" alt=""><span class="flip-hint">нажми, чтобы узнать подробнее</span></div><div class="flip-back"><div class="badge">'+item.id+'<span class="tick">✓</span></div><p class="flip-desc">'+item.text+"</p></div></div></div>";
+        return '<div class="flip-wrap" data-index="'+i+'"><div class="flip-inner"><div class="flip-front flip-front-img"><div class="badge">'+item.id+'<span class="tick">✓</span></div><img class="flip-img" src="'+item.image+'" alt=""><span class="flip-hint">Перевернуть</span></div><div class="flip-back"><div class="badge">'+item.id+'<span class="tick">✓</span></div><p class="flip-desc">'+item.text+"</p></div></div></div>";
       }).join("");
       var cards=[].slice.call(carousel.querySelectorAll(".flip-wrap"));
       dotsWrap.innerHTML=items.map(function(_,i){return '<button class="dot'+(i===0?" active":"")+'" aria-label="Карточка '+(i+1)+'"></button>';}).join("");
@@ -817,8 +823,9 @@
       cards.forEach(function(c,i){
         c.onclick=function(){
           if(checked) return;
-          if(selectedCard===i){c.classList.toggle("flipped");}
-          else{selectedCard=i;scrollToCard(i);}
+          selectedCard=i;
+          c.classList.add("flipped");
+          if(i!==current)scrollToCard(i);
           paintCards();paintOpts();
         };
       });

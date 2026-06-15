@@ -366,6 +366,23 @@
     background:var(--accent);box-shadow:0 8px 20px -6px rgba(255,0,50,.45);transition:transform .12s ease;
   }
   .done-close:active{transform:scale(.985);}
+
+  /* ── image match-cards (3-5) ───────────────────────────────── */
+  .match-card.img-card{padding:0;overflow:hidden;min-height:110px;}
+  .match-card.img-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;border-radius:18px 18px 0 0;}
+  .match-card.img-card .match-label{padding:7px 6px 9px;min-height:32px;display:flex;align-items:center;justify-content:center;line-height:1.2;}
+  .match-card.is-active{outline:3px solid var(--accent)!important;outline-offset:1px;box-shadow:0 0 0 5px var(--accent-soft);transform:scale(1.03);}
+  .match-card.img-card.is-selected .match-label{color:#fff;}
+  /* ── flip-image (6-9) ──────────────────────────────────────── */
+  .flip-front-img{padding:0;justify-content:flex-start;overflow:hidden;}
+  .flip-front-img .badge{z-index:1;}
+  .flip-img{width:100%;flex:1;min-height:100px;object-fit:cover;display:block;}
+  .flip-front-img .flip-hint{padding:10px 16px 14px;width:100%;text-align:center;box-sizing:border-box;}
+  /* ── skip button ───────────────────────────────────────────── */
+  .skip-btn{border:none;background:transparent;color:var(--muted);font-family:"MTS Compact",sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px;white-space:nowrap;flex-shrink:0;text-decoration:underline;text-underline-offset:2px;}
+  .skip-btn:hover{color:var(--accent);}
+  /* ── 3-col options grid (13-17 has up to 6 options) ──────── */
+  .opts-3col{grid-template-columns:1fr 1fr 1fr;}
 </style>
 </head>
 <body>
@@ -432,7 +449,7 @@
         <div class="options" id="s1-emos"></div>
       </div>
       <div class="footer">
-        <button class="check" type="button" id="s1-next" disabled>Далее</button>
+        <button class="check" type="button" id="s1-next" disabled>Проверить</button>
         <div class="result"></div>
       </div>
     </section>
@@ -447,8 +464,9 @@
         <span class="tb-title">6–9 лет</span>
       </div>
       <div class="scroll">
+        <div class="step-bar" id="s2-steps"></div>
         <section class="block b1">
-          <h2 class="title">Что происходило</h2>
+          <h2 class="title" id="s2-title">Выбери ситуацию и эмоцию</h2>
           <div class="carousel"></div>
           <div class="dots"></div>
         </section>
@@ -465,16 +483,6 @@
 
     <!-- ============ SCREEN 3: 10–12 лет ============ -->
     <section class="screen" id="screen3">
-      <div class="intro-modal" id="intro3">
-        <div class="intro-backdrop"></div>
-        <div class="intro-sheet">
-          <span class="intro-icon">🎧</span>
-          <h2 class="intro-title">Сначала послушай</h2>
-          <p class="intro-body">Сейчас прозвучит история. Слушай внимательно — потом нужно будет вспомнить, кто и что делал.</p>
-          <p class="intro-note">Аудио можно воспроизвести только один раз</p>
-          <button class="intro-cta" type="button">Готов слушать</button>
-        </div>
-      </div>
       <div class="topbar">
         <button class="back" type="button" data-nav="chooser">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -483,6 +491,7 @@
         <span class="tb-title">10–12 лет</span>
       </div>
       <div class="scroll">
+        <div class="step-bar"></div>
         <section class="player">
           <button class="play" aria-label="Воспроизвести">
             <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg>
@@ -490,6 +499,7 @@
           </button>
           <div class="wave" aria-hidden="true"></div>
           <span class="time">0:00</span>
+          <button class="skip-btn" type="button">Пропустить</button>
         </section>
         <section class="block b1">
           <h2 class="title">Что происходило</h2>
@@ -502,23 +512,13 @@
         </section>
       </div>
       <div class="footer">
-        <button class="check" type="button">Проверить</button>
+        <button class="check" type="button" disabled>Проверить</button>
         <div class="result"></div>
       </div>
     </section>
 
     <!-- ============ SCREEN 4: 13–17 лет ============ -->
     <section class="screen" id="screen4">
-      <div class="intro-modal" id="intro4">
-        <div class="intro-backdrop"></div>
-        <div class="intro-sheet">
-          <span class="intro-icon">🎧</span>
-          <h2 class="intro-title">Сначала послушай</h2>
-          <p class="intro-body">Сейчас прозвучит история. Слушай внимательно — потом нужно будет вспомнить, кто и что делал.</p>
-          <p class="intro-note">Аудио можно воспроизвести только один раз</p>
-          <button class="intro-cta" type="button">Готов слушать</button>
-        </div>
-      </div>
       <div class="topbar">
         <button class="back" type="button" data-nav="chooser">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -527,6 +527,7 @@
         <span class="tb-title">13–17 лет</span>
       </div>
       <div class="scroll">
+        <div class="step-bar"></div>
         <section class="player">
           <button class="play" aria-label="Воспроизвести">
             <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg>
@@ -534,6 +535,7 @@
           </button>
           <div class="wave" aria-hidden="true"></div>
           <span class="time">0:00</span>
+          <button class="skip-btn" type="button">Пропустить</button>
         </section>
         <section class="block b1">
           <h2 class="title">Что происходило</h2>
@@ -546,7 +548,7 @@
         </section>
       </div>
       <div class="footer">
-        <button class="check" type="button">Проверить</button>
+        <button class="check" type="button" disabled>Проверить</button>
         <div class="result"></div>
       </div>
     </section>
@@ -569,93 +571,17 @@
   "use strict";
 
   /* =========================================================
-     ДАННЫЕ
+     ДАННЫЕ (из json.json)
      ========================================================= */
-  var SITUATIONS = [
-    { letter:"A", icon:"📋", text:"Читала список",             answer:"Ника" },
-    { letter:"B", icon:"🎉", text:"Отнёс гирлянды в гостиную", answer:"Тёма" },
-    { letter:"C", icon:"🥤", text:"Уронил бумажные стаканчики", answer:"Марк" },
-    { letter:"D", icon:"🪑", text:"Отнёс стул в багажник",      answer:"Официант" },
-    { letter:"E", icon:"🍽️", text:"Накрывала на стол",          answer:"Девушка с фотоаппаратом" }
-  ];
+  var DATA = {"kind":"matching_set","title":"Кафе «Эмпатия»","version":1,"age_variants":{"3-5":{"tasks":[{"id":"s1","items":[{"id":"A","alt":"Радость","image":"https://tb.anilau.com/storage/2026/06/04/5326073f-1149-4b5c-b534-fb5bab29bc38.webp"},{"id":"B","alt":"Смущение","image":"https://tb.anilau.com/storage/2026/06/04/7fd11187-a8d9-4114-a2d2-75b5fdcf2937.webp"},{"id":"C","alt":"Удивление","image":"https://tb.anilau.com/storage/2026/06/04/6e3a16ef-a9d4-4c92-9770-75f1961d86e4.webp"},{"id":"D","alt":"Испуг","image":"https://tb.anilau.com/storage/2026/06/04/78ae43e5-39a7-4f78-aafd-c56d71416b89.webp"}],"title":"Выбери картинку и эмоцию к ней","prompt":"Посмотри на картинки и выбери подходящую эмоцию.","options":[{"id":"joy","text":"Радость"},{"id":"embarrassment","text":"Смущение"},{"id":"surprise","text":"Удивление"},{"id":"fright","text":"Испуг"}],"answer_key":{"A":"joy","B":"embarrassment","C":"surprise","D":"fright"}},{"id":"s2","items":[{"id":"A","alt":"Грусть","image":"https://tb.anilau.com/storage/2026/06/08/5939908b-fbc9-4ba3-b336-57d879c4e0b7.webp"},{"id":"B","alt":"Волнение","image":"https://tb.anilau.com/storage/2026/06/08/ec9fb712-3290-45c4-a4b5-f015778a6a9e.webp"},{"id":"C","alt":"Гнев","image":"https://tb.anilau.com/storage/2026/06/08/081d0772-482e-42fd-99a4-58abdc39b447.webp"},{"id":"D","alt":"Печаль","image":"https://tb.anilau.com/storage/2026/06/08/0c2150c4-c1fb-4637-ab8f-091fccc6f7f5.webp"}],"title":"Выбери картинку и эмоцию к ней","prompt":"Посмотри на картинки и выбери подходящую эмоцию.","options":[{"id":"sadness","text":"Грусть"},{"id":"excitement","text":"Волнение"},{"id":"anger","text":"Гнев"},{"id":"sorrow","text":"Печаль"}],"answer_key":{"A":"sadness","B":"excitement","C":"anger","D":"sorrow"}},{"id":"s3","items":[{"id":"A","alt":"Любовь","image":"https://tb.anilau.com/storage/2026/06/04/ca554bc9-4996-4abc-9d18-e0e96ea83dd0.webp"},{"id":"B","alt":"Доброта","image":"https://tb.anilau.com/storage/2026/06/03/f7069701-84ec-4b17-b2d6-473d5a7e2f09.webp"},{"id":"C","alt":"Гордость","image":"https://tb.anilau.com/storage/2026/06/03/0caecfc5-e989-414e-84d5-926e3906b2a2.webp"},{"id":"D","alt":"Игривость","image":"https://tb.anilau.com/storage/2026/06/03/ead793cc-dcf2-4ebf-a450-5e43d87c058b.webp"}],"title":"Выбери картинку и эмоцию к ней","prompt":"Посмотри на картинки и выбери подходящую эмоцию.","options":[{"id":"love","text":"Любовь"},{"id":"kindness","text":"Доброта"},{"id":"pride","text":"Гордость"},{"id":"playfulness","text":"Игривость"}],"answer_key":{"A":"love","B":"kindness","C":"pride","D":"playfulness"}},{"id":"s4","items":[{"id":"A","alt":"Зависть","image":"https://tb.anilau.com/storage/2026/06/08/81cb7c52-f784-4e78-85e7-511d45a4e9a7.webp"},{"id":"B","alt":"Обида","image":"https://tb.anilau.com/storage/2026/06/08/7754e2a4-3656-4026-b179-17a1643f4fa7.webp"},{"id":"C","alt":"Хитрость","image":"https://tb.anilau.com/storage/2026/06/08/6888f331-0781-4e8c-97b6-1734333aa839.webp"},{"id":"D","alt":"Тревога","image":"https://tb.anilau.com/storage/2026/06/08/3ed976a7-9cad-4b24-a658-8686dd0320e7.webp"}],"title":"Выбери картинку и эмоцию к ней","prompt":"Посмотри на картинки и выбери подходящую эмоцию.","options":[{"id":"envy","text":"Зависть"},{"id":"resentment","text":"Обида"},{"id":"cunning","text":"Хитрость"},{"id":"anxiety","text":"Тревога"}],"answer_key":{"A":"envy","B":"resentment","C":"cunning","D":"anxiety"}},{"id":"s5","items":[{"id":"A","alt":"Растерянность","image":"https://tb.anilau.com/storage/2026/06/08/a5f2f937-4e07-40bf-b73a-7099f80b28aa.webp"},{"id":"B","alt":"Брезгливость","image":"https://tb.anilau.com/storage/2026/06/08/1ec1d363-aeb4-40fe-bbbf-24b47062476a.webp"},{"id":"C","alt":"Восторг","image":"https://tb.anilau.com/storage/2026/06/08/2bdaa8cf-73fc-46c8-81a7-b980c3e09f8d.webp"},{"id":"D","alt":"Страх","image":"https://tb.anilau.com/storage/2026/06/08/761cb75b-e396-467d-b1b3-74addaf95c1a.webp"}],"title":"Выбери картинку и эмоцию к ней","prompt":"Посмотри на картинки и выбери подходящую эмоцию.","options":[{"id":"confusion","text":"Растерянность"},{"id":"disgust","text":"Брезгливость"},{"id":"delight","text":"Восторг"},{"id":"fear","text":"Страх"}],"answer_key":{"A":"confusion","B":"disgust","C":"delight","D":"fear"}}]},"6-9":{"tasks":[{"id":"s12","items":[{"id":"A","text":"Ты играешь с ребятами во дворе. Вдруг к вам подходят дети постарше. Один мальчик начинает дразнить твоего друга и толкает его плечом. У тебя внутри будто всё закипает. Хочется защитить друга и остановить обидчика.","image":"https://tb.anilau.com/storage/2026/06/04/eec26428-05de-4e26-928a-72b671afebba.webp"},{"id":"B","text":"Ты усердно работаешь и создаёшь башню из конструктора. Вдруг кто-то из родителей случайно задевает её рукой, и башня развалилась. Глаза становятся мокрыми, внутри неприятно и грустно. Кажется, что всё было зря.","image":"https://tb.anilau.com/storage/2026/06/04/fca01b24-bc73-4490-8f3d-9d41199f6f60.webp"},{"id":"C","text":"Вечером дома неожиданно выключается свет. Комната становится тёмной, за окном шумит ветер. Ты чувствуешь, как внутри всё сжимается, и подходишь ближе к маме.","image":"https://tb.anilau.com/storage/2026/06/04/e1c4ead9-ca7a-41fb-94e5-dc30bf605e9a.webp"}],"title":"Выбери ситуацию и эмоцию к ней","prompt":"Прочитай ситуацию и выбери подходящую эмоцию.","options":[{"id":"fear","text":"Страх"},{"id":"anger","text":"Злость"},{"id":"resentment","text":"Обида"}],"answer_key":{"A":"anger","B":"resentment","C":"fear"}},{"id":"s13","items":[{"id":"A","text":"Каникулы идут уже долго. Друзья разъехались, мультики надоели, игрушки тоже не радуют. Ты ходишь по комнате и не знаешь, чем заняться.","image":"https://tb.anilau.com/storage/2026/06/04/4c4c1e78-cc99-4177-80ae-0c2e55bbe546.webp"},{"id":"B","text":"Ты приходишь домой после школы, на столе лежит подарок, который давно тебе уже снится. Хочется прыгать, улыбаться и скорее открыть коробку.","image":"https://tb.anilau.com/storage/2026/06/04/e8da934f-1a60-447d-bcb7-2277b937b2ca.webp"},{"id":"C","text":"Ты открываешь дверь в комнату и видишь огромный воздушный шар с запиской: «Для тебя!». Твои глаза широко открываются и ты даже немного теряешь дар речи.","image":"https://tb.anilau.com/storage/2026/06/04/1515011c-7fc2-4b28-ac55-47854f6efda4.webp"}],"title":"Выбери ситуацию и эмоцию к ней","prompt":"Прочитай ситуацию и выбери подходящую эмоцию.","options":[{"id":"boredom","text":"Скука"},{"id":"joy","text":"Радость"},{"id":"surprise","text":"Удивление"}],"answer_key":{"A":"boredom","B":"joy","C":"surprise"}},{"id":"s14","items":[{"id":"A","text":"Ты долго учишься кататься на двухколёсном велосипеде и тренируешься несколько часов в день. И вот, наконец после упорных тренировок получилось проехать от дома до конца улицы! Внутри тепло и радостно, хочется рассказать об этом всем.","image":"https://tb.anilau.com/storage/2026/06/10/1838a49f-9a83-4dd4-ba04-647567f46551.webp"},{"id":"B","text":"На уроке ты случайно обращаешься к учительнице со слов: «Мама». Несколько ребят начинают смеяться. Щёки становятся горячими, хочется спрятать лицо.","image":"https://tb.anilau.com/storage/2026/06/10/d4136678-f601-45a1-aa29-fbfebde2dba4.webp"},{"id":"C","text":"Ты спокойно рисуешь дома, и вдруг рядом громко падает книга. Ты резко вздрагиваешь, а сердце начинает быстро стучать.","image":"https://tb.anilau.com/storage/2026/06/10/8c8a947e-71fd-4275-8114-278329e7c2a1.webp"}],"title":"Выбери ситуацию и эмоцию к ней","prompt":"Прочитай ситуацию и выбери подходящую эмоцию.","options":[{"id":"pride","text":"Гордость"},{"id":"shame","text":"Стыд"},{"id":"fear","text":"Испуг"}],"answer_key":{"A":"pride","B":"shame","C":"fear"}},{"id":"s15","items":[{"id":"A","text":"Ты очень ждёшь поход в батутный центр. Но утром мама говорит, что поездку придётся отменить. Настроение сразу падает, ничего больше не хочется.","image":"https://tb.anilau.com/storage/2026/06/10/349ce5a2-433b-4d0a-bd9a-3fc52183c64f.webp"},{"id":"B","text":"На сцене фокусник показывает трюк: из пустой коробки вдруг вылетают яркие ленты и появляется облако цветного дыма. Ты внимательно смотришь и хочешь понять, как это получилось.","image":"https://tb.anilau.com/storage/2026/06/10/f3e85e18-1884-405a-afcf-7e20b6bfceb6.webp"},{"id":"C","text":"В магазине незнакомая женщина вдруг говорит: «Какой у тебя красивый рисунок!» Ты не знаешь, что ответить, и тихо улыбаешься, глядя в пол.","image":"https://tb.anilau.com/storage/2026/06/10/2b3211ab-b64c-4628-aac9-c9b38161bc70.webp"}],"title":"Выбери ситуацию и эмоцию к ней","prompt":"Прочитай ситуацию и выбери подходящую эмоцию.","options":[{"id":"disappointment","text":"Разочарование"},{"id":"interest","text":"Интерес"},{"id":"embarrassment","text":"Смущение"}],"answer_key":{"A":"disappointment","B":"interest","C":"embarrassment"}},{"id":"s16","items":[{"id":"A","text":"Твой друг в школе показывает новый гаджет, который вы с друзьями давно обсуждали. Ты смотришь и думаешь: «Вот бы и мне такой...»","image":"https://tb.anilau.com/storage/2026/06/10/814efde3-9a6e-4bf1-b19b-40e51913d0fa.webp"},{"id":"B","text":"Нигде не можешь найти свой планшет. Уже почти хочется плакать, но вдруг папа находит его под сиденьем машины. Ты глубоко выдыхаешь, и внутри становится спокойно.","image":"https://tb.anilau.com/storage/2026/06/10/5e07fb02-d7a3-4af2-9b3f-d38b3ae1a1d3.webp"},{"id":"C","text":"Сейчас тебе выходить на сцену читать стихотворение перед всей школой. Ладони становятся влажными, сердце стучит быстро-быстро.","image":"https://tb.anilau.com/storage/2026/06/10/6eeb216e-c419-45e1-a852-c60bdd2eda5a.webp"}],"title":"Выбери ситуацию и эмоцию к ней","prompt":"Прочитай ситуацию и выбери подходящую эмоцию.","options":[{"id":"envy","text":"Зависть"},{"id":"relief","text":"Облегчение"},{"id":"excitement","text":"Волнение"}],"answer_key":{"A":"envy","B":"relief","C":"excitement"}}]},"10-12":{"tasks":[{"id":"s20","audio":"https://tb.anilau.com/storage/2026/06/04/eac7beb6-cc1f-47f3-a44d-c41317a10a1d.m4a","items":[{"id":"A","text":"Украшал торт"},{"id":"B","text":"Отнёс гирлянды в гостиную"},{"id":"C","text":"Отнёс стул в багажник"},{"id":"D","text":"Уронил бумажные стаканчики"}],"title":"Что происходило?","prompt":"Прослушай аудио и выбери правильный вариант.","options":[{"id":"cat","text":"Кот"},{"id":"masha","text":"Маша"},{"id":"papa","text":"Папа"},{"id":"lera","text":"Лера"}],"answer_key":{"A":"lera","B":"masha","C":"papa","D":"cat"}},{"id":"s21","audio":"https://tb.anilau.com/storage/2026/06/04/621a1564-e264-48ad-9d7b-d6fe6dec0cf9.m4a","items":[{"id":"A","text":"Складывал воду в синий рюкзак"},{"id":"B","text":"Резал яблоки"},{"id":"C","text":"Убрал плед в машину"},{"id":"D","text":"Выбежал во двор с мячом"}],"title":"Что происходило?","prompt":"Прослушай аудио и выбери правильный вариант.","options":[{"id":"papa","text":"Папа"},{"id":"dima","text":"Дима"},{"id":"anya","text":"Аня"},{"id":"brother","text":"Младший брат"}],"answer_key":{"A":"dima","B":"anya","C":"papa","D":"brother"}},{"id":"s22","audio":"https://tb.anilau.com/storage/2026/06/04/a1f24b21-fea0-4625-8808-ac812924c1ef.m4a","items":[{"id":"A","text":"Рисовал плакат"},{"id":"B","text":"Раскладывал маркеры"},{"id":"C","text":"Пошёл за атласом"},{"id":"D","text":"Проверял список конкурса"}],"title":"Что происходило?","prompt":"Прослушай аудио и выбери правильный вариант.","options":[{"id":"max","text":"Макс"},{"id":"sonya","text":"Соня"},{"id":"teacher","text":"Учительница"},{"id":"kirill","text":"Кирилл"}],"answer_key":{"A":"kirill","B":"sonya","C":"max","D":"teacher"}}]},"13-17":{"tasks":[{"id":"s30","audio":"https://tb.anilau.com/storage/2026/06/04/94aa475f-abbf-425b-bbd2-538630178675.m4a","items":[{"id":"A","text":"Читала список заказов"},{"id":"B","text":"Выбирал пирожные у витрины"},{"id":"C","text":"Искала розетку для ноутбука"},{"id":"D","text":"Забрал поднос с напитками"}],"title":"Что происходило?","prompt":"Прослушай аудио и выбери правильный вариант.","options":[{"id":"mark","text":"Марк"},{"id":"nika","text":"Ника"},{"id":"lera","text":"Лера"},{"id":"tyoma","text":"Тёма"},{"id":"waiter","text":"Официант"},{"id":"photo_girl","text":"Девушка с фотоаппаратом"}],"answer_key":{"A":"nika","B":"tyoma","C":"lera","D":"mark"}},{"id":"s31","audio":"https://tb.anilau.com/storage/2026/06/04/ce62fb6e-6a4c-4cda-85ab-636f64838b31.m4a","items":[{"id":"A","text":"Обводил точки на карте"},{"id":"B","text":"Проверяла рюкзак с реквизитом"},{"id":"C","text":"Покупал транспортные карты"},{"id":"D","text":"Снимала видео для сторис"}],"title":"Что происходило?","prompt":"Прослушай аудио и выбери правильный вариант.","options":[{"id":"kira","text":"Кира"},{"id":"danya","text":"Даня"},{"id":"asya","text":"Ася"},{"id":"roma","text":"Рома"}],"answer_key":{"A":"danya","B":"asya","C":"roma","D":"kira"}},{"id":"s32","audio":"https://tb.anilau.com/storage/2026/06/04/fdad39b4-075d-4ca1-8ef7-ed8b087942c1.m4a","items":[{"id":"A","text":"Раскладывала карточки с вопросами"},{"id":"B","text":"Настраивал микрофоны"},{"id":"C","text":"Наливала воду в стаканы"},{"id":"D","text":"Записывал тестовый фрагмент"}],"title":"Что происходило?","prompt":"Прослушай аудио и выбери правильный вариант.","options":[{"id":"ilya","text":"Илья"},{"id":"sonya","text":"Соня"},{"id":"gleb","text":"Глеб"},{"id":"maya","text":"Майя"}],"answer_key":{"A":"maya","B":"ilya","C":"sonya","D":"gleb"}}]}}};
 
-  var SITUATIONS_6_9 = [
-    { letter:"A", icon:"📋", text:"Читала список",
-      desc:"Стояла у стены с листочком в руках и читала вслух пункт за пунктом, иногда кивая и делая пометки карандашом.",
-      answer:"Ника" },
-    { letter:"B", icon:"🎉", text:"Отнёс гирлянды в гостиную",
-      desc:"Взял несколько коробок с гирляндами и аккуратно отнёс их в гостиную, начав развешивать по стенам и углам комнаты.",
-      answer:"Тёма" },
-    { letter:"C", icon:"🥤", text:"Уронил бумажные стаканчики",
-      desc:"Нёс высокую стопку бумажных стаканчиков, но зацепился за ковёр и выронил их — они рассыпались по всему полу.",
-      answer:"Марк" },
-    { letter:"D", icon:"🪑", text:"Отнёс стул в багажник",
-      desc:"Поднял лёгкий складной стул и понёс через двор к припаркованной машине, осторожно загрузив его в открытый багажник.",
-      answer:"Официант" },
-    { letter:"E", icon:"🍽️", text:"Накрывала на стол",
-      desc:"Неторопливо расставляла тарелки и раскладывала приборы, иногда останавливаясь, чтобы сделать снимок сервировки.",
-      answer:"Девушка с фотоаппаратом" }
-  ];
-
-  var PEOPLE = ["Марк","Официант","Ника","Лера","Тёма","Девушка с фотоаппаратом"];
-
-  var PEOPLE_EMOJI = {
-    "Марк":"👦","Официант":"🤵","Ника":"👧",
-    "Лера":"👩","Тёма":"🧒","Девушка с фотоаппаратом":"📷"
-  };
-
-  var BATCHES_3_5 = [
-    { pics:[{id:"A",emoji:"🤗"},{id:"B",emoji:"😄"},{id:"C",emoji:"😢"},{id:"D",emoji:"😠"}], emotions:["Доброта","Радость","Грусть","Злость"] },
-    { pics:[{id:"A",emoji:"😨"},{id:"B",emoji:"😌"},{id:"C",emoji:"🤩"},{id:"D",emoji:"😒"}], emotions:["Страх","Спокойствие","Восторг","Скука"] },
-    { pics:[{id:"A",emoji:"😁"},{id:"B",emoji:"😔"},{id:"C",emoji:"😳"},{id:"D",emoji:"🥰"}], emotions:["Гордость","Грусть","Смущение","Любовь"] },
-    { pics:[{id:"A",emoji:"😰"},{id:"B",emoji:"🤗"},{id:"C",emoji:"😤"},{id:"D",emoji:"😂"}], emotions:["Тревога","Благодарность","Обида","Веселье"] },
-    { pics:[{id:"A",emoji:"😭"},{id:"B",emoji:"😍"},{id:"C",emoji:"😬"},{id:"D",emoji:"😎"}], emotions:["Горе","Восхищение","Нервозность","Уверенность"] }
-  ];
-
-  var FLIP_6_9 = [
-    { id:"A", emoji:"🏃", front:"Убегает от собаки",   desc:"Мальчик увидел большую собаку без поводка и очень быстро побежал прочь. Сердце колотилось, ноги не слушались.",                                    answer:"Страх" },
-    { id:"B", emoji:"🎂", front:"День рождения",        desc:"Все друзья пришли на праздник, торт был огромным, а подарки — самыми лучшими. Девочка прыгала от счастья.",                                         answer:"Радость" },
-    { id:"C", emoji:"💔", front:"Сломали игрушку",      desc:"Старший брат случайно сломал любимую машинку. Малыш сжал кулаки и почувствовал, как внутри всё закипает.",                                          answer:"Обида" },
-    { id:"D", emoji:"🌅", front:"Вечер дома",           desc:"После шумного дня ребёнок лёг на диван, укрылся пледом и смотрел в окно. Всё хорошо, ничего не беспокоит.",                                       answer:"Спокойствие" }
-  ];
-
-  var TOTAL = SITUATIONS.length;
+  var TASKS_3_5   = DATA.age_variants["3-5"].tasks;
+  var TASKS_6_9   = DATA.age_variants["6-9"].tasks;
+  var TASKS_10_12 = DATA.age_variants["10-12"].tasks;
+  var TASKS_13_17 = DATA.age_variants["13-17"].tasks;
 
   function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
   function fmt(s){ var m=Math.floor(s/60),ss=s%60; return m+":"+(ss<10?"0":"")+ss; }
-
-  /* ---------------- audio player ---------------- */
-  var players=[];
-  function initPlayer(screen, onEnd){
-    var playBtn=screen.querySelector(".play");
-    var wave=screen.querySelector(".wave");
-    var timeEl=screen.querySelector(".time");
-    var BARS=42,bars=[];
-    for(var i=0;i<BARS;i++){
-      var b=document.createElement("span"); b.className="bar";
-      var h=24+Math.round((Math.sin(i*1.7)*.5+.5)*60+(i%5)*4);
-      b.style.height=Math.min(100,h)+"%";
-      b.style.animationDelay=(i*.035).toFixed(2)+"s";
-      wave.appendChild(b); bars.push(b);
-    }
-    var DURATION=5,cur=0,timer=null;
-    function paint(){
-      var played=Math.round(cur/DURATION*BARS);
-      for(var i=0;i<BARS;i++) bars[i].classList.toggle("played",i<played);
-      timeEl.textContent=fmt(cur);
-    }
-    function stop(){ clearInterval(timer); timer=null; playBtn.classList.remove("is-playing"); wave.classList.remove("is-playing"); playBtn.setAttribute("aria-label","Воспроизвести"); }
-    playBtn.addEventListener("click",function(){
-      if(playBtn.disabled) return;
-      if(timer){ stop(); return; }
-      if(cur>=DURATION) cur=0;
-      playBtn.classList.add("is-playing"); wave.classList.add("is-playing"); playBtn.setAttribute("aria-label","Пауза");
-      timer=setInterval(function(){ cur++; paint(); if(cur>=DURATION){ paint(); stop(); cur=0; setTimeout(paint,400); if(onEnd) onEnd(); } },1000);
-    });
-    paint();
-    return { stop:stop, reset:function(){ cur=0; playBtn.disabled=false; paint(); } };
-  }
-  function stopAllPlayers(){ players.forEach(function(p){ p.stop(); }); }
 
   var doneModal=document.getElementById("done-modal");
   var doneIcon=document.getElementById("done-icon");
@@ -671,400 +597,301 @@
   }
 
   /* ============================================================
-     SCREEN 1 — 3–5 лет: 5 пачек по 4 картинки + 4 эмоции
+     SCREEN 1 — 3–5 лет
      ============================================================ */
   function initScreen1(root){
-    var stepsEl=root.querySelector("#s1-steps");
-    var picsEl=root.querySelector("#s1-pics");
-    var emosEl=root.querySelector("#s1-emos");
-    var nextBtn=root.querySelector("#s1-next");
-    var N=BATCHES_3_5.length;
-    var step=0, answers={}, selectedPic=null;
-
+    var stepsEl=root.querySelector("#s1-steps"),picsEl=root.querySelector("#s1-pics"),emosEl=root.querySelector("#s1-emos"),nextBtn=root.querySelector("#s1-next");
+    var N=TASKS_3_5.length,step=0,taskCorrects=[];
     function renderSteps(){
-      stepsEl.innerHTML=BATCHES_3_5.map(function(_,i){
-        var cls=i<step?"done":i===step?"active":"";
-        return '<span class="step-dot '+cls+'">'+(i<step?"✓":(i+1))+"</span>";
+      stepsEl.innerHTML=TASKS_3_5.map(function(_,i){
+        return '<span class="step-dot '+(i<step?"done":i===step?"active":"")+'">'+(i<step?"✓":(i+1))+"</span>";
       }).join("");
     }
-    function renderPics(){
-      var b=BATCHES_3_5[step];
-      picsEl.innerHTML=b.pics.map(function(p){
-        var ans=answers[p.id]||"";
-        var isSel=selectedPic===p.id;
-        var isAns=!!ans;
-        var cls="match-card"+(isSel?" is-active":"")+(isAns&&!isSel?" answered":"");
-        return '<button class="'+cls+'" type="button" data-pic="'+p.id+'">'
-          +'<span class="match-emoji">'+p.emoji+'</span>'
-          +(ans?'<span class="match-label">'+ans+'</span>':'')
-          +'</button>';
-      }).join("");
-      [].slice.call(picsEl.querySelectorAll(".match-card")).forEach(function(btn){
-        btn.addEventListener("click",function(){
-          var id=btn.getAttribute("data-pic");
-          selectedPic=(selectedPic===id)?null:id;
-          renderPics(); renderEmos();
+    function renderTask(){
+      var task=TASKS_3_5[step],answers={},selectedPic=null,checked=false;
+      renderSteps();
+      function rePics(){
+        picsEl.innerHTML=task.items.map(function(item){
+          var oId=answers[item.id]||"",opt=task.options.filter(function(o){return o.id===oId;})[0];
+          var sel=selectedPic===item.id;
+          var cls="match-card img-card"+(sel?" is-active":"")+(oId?" answered":"");
+          if(checked) cls+=task.answer_key[item.id]===oId?" correct":" wrong";
+          return '<button class="'+cls+'" type="button" data-pic="'+item.id+'"><img src="'+item.image+'" alt="'+item.alt+'"><span class="match-label">'+(opt?opt.text:"—")+"</span></button>";
+        }).join("");
+        if(!checked)[].slice.call(picsEl.querySelectorAll(".match-card")).forEach(function(b){
+          b.onclick=function(){var id=b.getAttribute("data-pic");selectedPic=(selectedPic===id)?null:id;rePics();reEmos();};
         });
-      });
-    }
-    function renderEmos(){
-      var b=BATCHES_3_5[step];
-      emosEl.innerHTML=b.emotions.map(function(e){
-        var isAssigned=Object.keys(answers).some(function(k){ return answers[k]===e; });
-        var isMine=!!(selectedPic&&answers[selectedPic]===e);
-        var isUsed=isAssigned&&!isMine;
-        return '<button class="opt'+(isUsed?" is-used":"")+(isMine?" is-selected":"")+'" type="button" data-emo="'+e+'">'+e+'</button>';
-      }).join("");
-      [].slice.call(emosEl.querySelectorAll(".opt")).forEach(function(btn){
-        btn.addEventListener("click",function(){
-          if(!selectedPic) return;
-          var e=btn.getAttribute("data-emo");
-          if(answers[selectedPic]===e){ delete answers[selectedPic]; }
-          else {
-            Object.keys(answers).forEach(function(k){ if(answers[k]===e) delete answers[k]; });
-            answers[selectedPic]=e;
-          }
-          var b=BATCHES_3_5[step];
-          var unanswered=b.pics.filter(function(p){ return !answers[p.id]; });
-          selectedPic=unanswered.length>0?unanswered[0].id:null;
-          renderPics(); renderEmos(); updateNext();
+      }
+      function reEmos(){
+        emosEl.innerHTML=task.options.map(function(opt){
+          var mine=!!(selectedPic&&answers[selectedPic]===opt.id);
+          var used=!mine&&Object.keys(answers).some(function(k){return answers[k]===opt.id;});
+          return '<button class="opt'+(used?" is-used":"")+(mine?" is-selected":"")+'" type="button" data-opt="'+opt.id+'">'+opt.text+"</button>";
+        }).join("");
+        if(!checked)[].slice.call(emosEl.querySelectorAll(".opt")).forEach(function(b){
+          b.onclick=function(){
+            if(!selectedPic) return;
+            var oId=b.getAttribute("data-opt");
+            if(answers[selectedPic]===oId){delete answers[selectedPic];}
+            else{Object.keys(answers).forEach(function(k){if(answers[k]===oId)delete answers[k];});answers[selectedPic]=oId;}
+            var un=task.items.filter(function(it){return !answers[it.id];});
+            selectedPic=un.length?un[0].id:null;
+            rePics();reEmos();upBtn();
+          };
         });
-      });
+      }
+      function upBtn(){nextBtn.disabled=!task.items.every(function(it){return answers[it.id];});nextBtn.textContent="Проверить";}
+      nextBtn.onclick=function(){
+        if(checked) return;
+        checked=true;
+        taskCorrects[step]=task.items.filter(function(it){return task.answer_key[it.id]===answers[it.id];}).length;
+        rePics();
+        nextBtn.textContent=step<N-1?"Далее":"Завершить";nextBtn.disabled=false;
+        nextBtn.onclick=function(){
+          if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
+          else showDoneModal(taskCorrects.reduce(function(a,b){return a+b;},0),N*4);
+        };
+      };
+      rePics();reEmos();upBtn();
     }
-    function updateNext(){
-      var b=BATCHES_3_5[step];
-      var done=b.pics.every(function(p){ return answers[p.id]; });
-      nextBtn.disabled=!done;
-      nextBtn.textContent=(step===N-1)?"Завершить":"Далее";
-    }
-    function render(){
-      answers={}; selectedPic=null;
-      renderSteps(); renderPics(); renderEmos(); updateNext();
-    }
-
-    nextBtn.addEventListener("click",function(){
-      if(step<N-1){ step++; render(); root.querySelector(".scroll").scrollTop=0; }
-      else { showDoneModal(N,N); }
-    });
-
-    render();
-    return { refresh:function(){ step=0; render(); } };
+    renderTask();
+    return{refresh:function(){step=0;taskCorrects=[];renderTask();}};
   }
 
   /* ============================================================
-     SCREEN 2 — 6–9 лет: flip cards carousel + эмоции
+     SCREEN 2 — 6–9 лет
      ============================================================ */
   function initScreen2(root){
-    var carousel=root.querySelector(".carousel");
-    var dotsWrap=root.querySelector(".dots");
-    var optsWrap=root.querySelector(".options");
-    var checkBtn=root.querySelector(".check");
-    var resultEl=root.querySelector(".result");
-    var answers={}, current=0, selectedCard=null;
-    var TOTAL2=FLIP_6_9.length;
-
-    carousel.innerHTML=FLIP_6_9.map(function(f,i){
-      return '<div class="flip-wrap" data-index="'+i+'">'
-        +'<div class="flip-inner">'
-        +'<div class="flip-front">'
-        +'<div class="badge">'+f.id+'<span class="tick">✓</span></div>'
-        +'<span class="flip-ico">'+f.emoji+'</span>'
-        +'<span class="flip-word">'+f.front+'</span>'
-        +'<span class="flip-hint">нажми, чтобы узнать подробнее</span>'
-        +'</div>'
-        +'<div class="flip-back">'
-        +'<div class="badge">'+f.id+'<span class="tick">✓</span></div>'
-        +'<p class="flip-desc">'+f.desc+'</p>'
-        +'</div>'
-        +'</div>'
-        +'</div>';
-    }).join("");
-    var cards=[].slice.call(carousel.querySelectorAll(".flip-wrap"));
-
-    dotsWrap.innerHTML=FLIP_6_9.map(function(_,i){
-      return '<button class="dot'+(i===0?' active':'')+'" aria-label="Ситуация '+(i+1)+'"></button>';
-    }).join("");
-    var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
-    dots.forEach(function(dot,i){ dot.addEventListener("click",function(){ scrollToCard(i); }); });
-
-    var optEmotions=FLIP_6_9.map(function(f){ return f.answer; });
-    optsWrap.innerHTML=optEmotions.map(function(e){
-      return '<button class="opt" type="button" data-emo="'+e+'">'+e+'</button>';
-    }).join("");
-    var opts=[].slice.call(optsWrap.querySelectorAll(".opt"));
-
-    function step2(){ if(!cards[0]) return 1; var gap=parseFloat(getComputedStyle(carousel).gap)||14; return (cards[0].getBoundingClientRect().width||1)+gap; }
-    function scrollToCard(i){ carousel.scrollTo({left:i*step2(),behavior:"smooth"}); }
-
-    function paintCards(){
-      cards.forEach(function(c,i){
-        c.classList.toggle("is-sel", i===selectedCard);
-        c.classList.toggle("answered", answers[i]!==undefined);
-      });
+    var stepsEl=root.querySelector("#s2-steps"),carousel=root.querySelector(".carousel"),dotsWrap=root.querySelector(".dots"),optsWrap=root.querySelector(".options"),checkBtn=root.querySelector(".check");
+    var N=TASKS_6_9.length,step=0,taskCorrects=[];
+    function renderSteps(){
+      stepsEl.innerHTML=TASKS_6_9.map(function(_,i){
+        return '<span class="step-dot '+(i<step?"done":i===step?"active":"")+'">'+(i<step?"✓":(i+1))+"</span>";
+      }).join("");
     }
-    function paintOptions(){
-      opts.forEach(function(btn){
-        var e=btn.getAttribute("data-emo");
-        var isSelected=selectedCard!==null && answers[selectedCard]===e;
-        var isUsed=!isSelected && (function(){ var u=false; Object.keys(answers).forEach(function(k){ if(answers[k]===e) u=true; }); return u; })();
-        btn.classList.toggle("is-selected",isSelected);
-        btn.classList.toggle("is-used",isUsed);
-      });
-    }
-    function updateCheck(){
-      var n=Object.keys(answers).length;
-      if(n===TOTAL2){ checkBtn.textContent="Проверить"; checkBtn.disabled=false; }
-      else { checkBtn.textContent=(n>0)?("Выбрано "+n+" из "+TOTAL2):"Проверить"; checkBtn.disabled=true; }
-    }
-
-    cards.forEach(function(c,i){
-      c.addEventListener("click",function(){
-        c.classList.toggle("flipped");
-        selectedCard=i;
-        if(i!==current){ scrollToCard(i); }
-        paintCards(); paintOptions();
-      });
-    });
-
-    opts.forEach(function(btn){
-      btn.addEventListener("click",function(){
-        if(selectedCard===null){ checkBtn.classList.remove("shake"); void checkBtn.offsetWidth; checkBtn.classList.add("shake"); return; }
-        var e=btn.getAttribute("data-emo");
-        if(answers[selectedCard]===e){
-          delete answers[selectedCard];
-          cards[selectedCard].classList.remove("answered","correct","wrong");
-          paintCards(); paintOptions(); updateCheck(); return;
-        }
-        Object.keys(answers).forEach(function(k){ if(answers[k]===e){ delete answers[k]; cards[parseInt(k,10)].classList.remove("answered","correct","wrong"); } });
-        answers[selectedCard]=e;
-        cards[selectedCard].classList.add("answered"); cards[selectedCard].classList.remove("correct","wrong");
-        var prev=selectedCard;
-        if(Object.keys(answers).length<TOTAL2){
-          for(var kk=1;kk<=TOTAL2;kk++){
-            var nx=(prev+kk)%TOTAL2;
-            if(answers[nx]===undefined){ selectedCard=nx; (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx); break; }
-          }
-        } else { selectedCard=null; }
-        paintCards(); paintOptions(); updateCheck();
-      });
-    });
-
-    var raf2=null;
-    carousel.addEventListener("scroll",function(){
-      if(raf2) return;
-      raf2=requestAnimationFrame(function(){
-        raf2=null;
-        var i=clamp(Math.round(carousel.scrollLeft/step2()),0,TOTAL2-1);
-        if(i!==current){ current=i; selectedCard=i; dots.forEach(function(d,n){ d.classList.toggle("active",n===i); }); paintCards(); paintOptions(); }
-      });
-    },{passive:true});
-
-    checkBtn.addEventListener("click",function(){
-      var correct=0;
-      cards.forEach(function(c,i){ var ok=answers[i]===FLIP_6_9[i].answer; if(ok) correct++; c.classList.toggle("correct",ok); c.classList.toggle("wrong",!ok); });
-      showDoneModal(correct,TOTAL2);
-    });
-
-    updateCheck();
-    return { refresh:function(){
-      answers={}; selectedCard=null; current=0;
-      carousel.scrollTo({left:0,behavior:"instant"});
-      cards.forEach(function(c){ c.classList.remove("answered","correct","wrong","is-sel","flipped"); });
-      opts.forEach(function(b){ b.classList.remove("is-selected","is-used"); });
-      updateCheck();
-    }};
-  }
-
-  /* ============================================================
-     SCREEN 3 & 4 — 10–12 и 13–17 лет: carousel + options
-     ============================================================ */
-  function initCarouselScreen(root){
-    var carousel=root.querySelector(".carousel");
-    var dotsWrap=root.querySelector(".dots");
-    var optsWrap=root.querySelector(".options");
-    var checkBtn=root.querySelector(".check");
-    var resultEl=root.querySelector(".result");
-    var answers={}, current=0, selectedCard=null;
-
-    carousel.innerHTML=SITUATIONS.map(function(s,i){
-      return '<article class="card" data-index="'+i+'">'
-        +'<span class="badge">'+s.letter+'<span class="tick">✓</span></span>'
-        +'<span class="glyph">'+s.icon+'</span>'
-        +'<span class="phrase">'+s.text+'</span></article>';
-    }).join("");
-    var cards=[].slice.call(carousel.querySelectorAll(".card"));
-
-    dotsWrap.innerHTML=SITUATIONS.map(function(s,i){
-      return '<button class="dot'+(i===0?' active':'')+'" aria-label="Ситуация '+(i+1)+'"></button>';
-    }).join("");
-    var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
-    dots.forEach(function(dot,i){ dot.addEventListener("click",function(){ scrollToCard(i); }); });
-
-    optsWrap.innerHTML=PEOPLE.map(function(p){
-      return '<button class="opt" type="button" data-person="'+p+'">'+p+'</button>';
-    }).join("");
-    var opts=[].slice.call(optsWrap.querySelectorAll(".opt"));
-
-    function step(){
-      if(!cards[0]) return 1;
-      var gap=parseFloat(getComputedStyle(carousel).gap)||14;
-      return (cards[0].getBoundingClientRect().width||1)+gap;
-    }
-    function scrollToCard(i){ carousel.scrollTo({left:i*step(),behavior:"smooth"}); }
-
-    function paintCards(){
-      cards.forEach(function(c,i){
-        c.classList.toggle("is-active", i===current && i!==selectedCard);
-        c.classList.toggle("is-sel", i===selectedCard);
-        c.classList.toggle("answered", answers[i]!==undefined);
-      });
-    }
-    function paintOptions(){
-      opts.forEach(function(btn){
-        var p=btn.getAttribute("data-person");
-        var isSelected=selectedCard!==null && answers[selectedCard]===p;
-        var isUsed=!isSelected && (function(){
-          var u=false;
-          Object.keys(answers).forEach(function(k){ if(answers[k]===p) u=true; });
-          return u;
-        })();
-        btn.classList.toggle("is-selected",isSelected);
-        btn.classList.toggle("is-used",isUsed);
-        btn.setAttribute("aria-pressed",isSelected?"true":"false");
-      });
-    }
-    function updateCheckLabel(){
-      var n=Object.keys(answers).length;
-      if(n===TOTAL){ checkBtn.textContent="Проверить"; checkBtn.disabled=false; }
-      else { checkBtn.textContent=(n>0)?("Выбрано "+n+" из "+TOTAL):"Проверить"; checkBtn.disabled=true; }
-    }
-
-    cards.forEach(function(c,i){
-      c.style.cursor="pointer";
-      c.addEventListener("click",function(){
-        selectedCard=(selectedCard===i)?null:i;
-        if(selectedCard!==null && i!==current){ scrollToCard(i); }
-        paintCards(); paintOptions();
-      });
-    });
-
-    opts.forEach(function(btn){
-      btn.setAttribute("aria-pressed","false");
-      btn.addEventListener("click",function(){
-        if(selectedCard===null){
-          checkBtn.classList.remove("shake"); void checkBtn.offsetWidth; checkBtn.classList.add("shake");
-          return;
-        }
-        var p=btn.getAttribute("data-person");
-        if(answers[selectedCard]===p){
-          delete answers[selectedCard];
-          cards[selectedCard].classList.remove("answered","correct","wrong");
-          resultEl.textContent=""; resultEl.className="result";
-          paintCards(); paintOptions(); updateCheckLabel(); return;
-        }
-        Object.keys(answers).forEach(function(k){
-          if(answers[k]===p){ delete answers[k]; cards[parseInt(k,10)].classList.remove("answered","correct","wrong"); }
+    function renderTask(){
+      var task=TASKS_6_9[step],items=task.items,opts=task.options,TOTAL=items.length;
+      var answers={},selectedCard=null,current=0,checked=false;
+      renderSteps();
+      carousel.innerHTML=items.map(function(item,i){
+        return '<div class="flip-wrap" data-index="'+i+'"><div class="flip-inner"><div class="flip-front flip-front-img"><div class="badge">'+item.id+'<span class="tick">✓</span></div><img class="flip-img" src="'+item.image+'" alt=""><span class="flip-hint">нажми, чтобы узнать подробнее</span></div><div class="flip-back"><div class="badge">'+item.id+'<span class="tick">✓</span></div><p class="flip-desc">'+item.text+"</p></div></div></div>";
+      }).join("");
+      var cards=[].slice.call(carousel.querySelectorAll(".flip-wrap"));
+      dotsWrap.innerHTML=items.map(function(_,i){return '<button class="dot'+(i===0?" active":"")+'" aria-label="Карточка '+(i+1)+'"></button>';}).join("");
+      var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
+      dots.forEach(function(d,i){d.onclick=function(){scrollToCard(i);};});
+      optsWrap.innerHTML=opts.map(function(opt){return '<button class="opt" type="button" data-opt="'+opt.id+'">'+opt.text+"</button>";}).join("");
+      var optBtns=[].slice.call(optsWrap.querySelectorAll(".opt"));
+      function sw(){if(!cards[0])return 1;return (cards[0].getBoundingClientRect().width||1)+(parseFloat(getComputedStyle(carousel).gap)||14);}
+      function scrollToCard(i){carousel.scrollTo({left:i*sw(),behavior:"smooth"});}
+      function paintCards(){
+        cards.forEach(function(c,i){
+          c.classList.toggle("is-sel",i===selectedCard);c.classList.toggle("answered",answers[i]!==undefined);
+          if(checked){var ok=task.answer_key[items[i].id]===answers[i];c.classList.toggle("correct",ok);c.classList.toggle("wrong",!ok);}
         });
-        answers[selectedCard]=p;
-        cards[selectedCard].classList.add("answered"); cards[selectedCard].classList.remove("correct","wrong");
-        resultEl.textContent=""; resultEl.className="result";
-        var prev=selectedCard;
-        if(Object.keys(answers).length<TOTAL){
-          for(var k=1;k<=TOTAL;k++){
-            var nx=(prev+k)%TOTAL;
-            if(answers[nx]===undefined){
-              selectedCard=nx;
-              (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx);
-              break;
-            }
-          }
-        } else {
-          selectedCard=null;
-        }
-        paintCards(); paintOptions(); updateCheckLabel();
-      });
-    });
-
-    var raf=null;
-    carousel.addEventListener("scroll",function(){
-      if(raf) return;
-      raf=requestAnimationFrame(function(){
-        raf=null;
-        var i=clamp(Math.round(carousel.scrollLeft/step()),0,TOTAL-1);
-        if(i!==current){
-          current=i;
-          selectedCard=i;
-          dots.forEach(function(d,n){ d.classList.toggle("active",n===i); });
-          paintCards(); paintOptions();
-        }
-      });
-    },{passive:true});
-
-    checkBtn.addEventListener("click",function(){
-      var correct=0;
+      }
+      function paintOpts(){
+        optBtns.forEach(function(b){
+          var oId=b.getAttribute("data-opt"),mine=selectedCard!==null&&answers[selectedCard]===oId;
+          var used=!mine&&Object.keys(answers).some(function(k){return answers[k]===oId;});
+          b.classList.toggle("is-selected",mine);b.classList.toggle("is-used",used);
+        });
+      }
+      function upCheck(){checkBtn.disabled=Object.keys(answers).length<TOTAL||checked;checkBtn.textContent="Проверить";}
       cards.forEach(function(c,i){
-        var ok=answers[i]===SITUATIONS[i].answer; if(ok) correct++;
-        c.classList.toggle("correct",ok); c.classList.toggle("wrong",!ok);
+        c.onclick=function(){
+          if(checked) return;
+          if(selectedCard===i){c.classList.toggle("flipped");}
+          else{selectedCard=i;scrollToCard(i);}
+          paintCards();paintOpts();
+        };
       });
-      showDoneModal(correct,TOTAL);
-    });
-
-    updateCheckLabel();
-    return { refresh:function(){
-      answers={}; selectedCard=null; current=0;
-      carousel.scrollTo({left:0,behavior:"instant"});
-      cards.forEach(function(c){ c.classList.remove("answered","correct","wrong","is-sel","is-active"); });
-      dots.forEach(function(d,n){ d.classList.toggle("active",n===0); });
-      paintCards(); paintOptions(); updateCheckLabel();
-    }};
+      optBtns.forEach(function(b){
+        b.onclick=function(){
+          if(checked||selectedCard===null) return;
+          var oId=b.getAttribute("data-opt");
+          if(answers[selectedCard]===oId){delete answers[selectedCard];}
+          else{
+            Object.keys(answers).forEach(function(k){if(answers[k]===oId)delete answers[k];});
+            answers[selectedCard]=oId;
+            var prev=selectedCard,found=false;
+            for(var k=1;k<=TOTAL;k++){var nx=(prev+k)%TOTAL;if(answers[nx]===undefined){selectedCard=nx;(function(t){setTimeout(function(){scrollToCard(t);},260);})(nx);found=true;break;}}
+            if(!found)selectedCard=null;
+          }
+          paintCards();paintOpts();upCheck();
+        };
+      });
+      var raf2=null;
+      carousel.addEventListener("scroll",function(){
+        if(raf2)return;
+        raf2=requestAnimationFrame(function(){
+          raf2=null;
+          var i=clamp(Math.round(carousel.scrollLeft/sw()),0,TOTAL-1);
+          if(i!==current){current=i;if(selectedCard===null)selectedCard=i;dots.forEach(function(d,n){d.classList.toggle("active",n===i);});paintCards();paintOpts();}
+        });
+      },{passive:true});
+      checkBtn.onclick=function(){
+        if(checked)return;
+        checked=true;
+        taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
+        paintCards();
+        checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
+        checkBtn.onclick=function(){
+          if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
+          else showDoneModal(taskCorrects.reduce(function(a,b){return a+b;},0),N*3);
+        };
+      };
+      selectedCard=0;paintCards();paintOpts();upCheck();
+    }
+    renderTask();
+    return{refresh:function(){step=0;taskCorrects=[];renderTask();root.querySelector(".scroll").scrollTop=0;}};
   }
 
   /* ============================================================
-     SCREEN 3 — 10–12 лет: modal intro + audio lock + carousel
+     SCREENS 3 & 4 — аудио + карусель
      ============================================================ */
-  function initScreen3(root){
-    var introModal=root.querySelector(".intro-modal");
-    var introCta=root.querySelector(".intro-cta");
-    var blockEls=[].slice.call(root.querySelectorAll(".block"));
-    var footerEl=root.querySelector(".footer");
-    var playBtn=root.querySelector(".play");
-    var audioListened=false;
-
-    blockEls.forEach(function(b){ b.style.display="none"; });
-    footerEl.style.display="none";
-
-    var carousel=initCarouselScreen(root);
-
-    function revealTask(){
-      if(audioListened) return;
-      audioListened=true;
-      playBtn.disabled=true;
-      blockEls.forEach(function(b){
-        b.style.display="";
-        b.style.animation="rise .5s both";
-      });
-      footerEl.style.display="";
-      var scrollEl=root.querySelector(".scroll");
-      var b1=root.querySelector(".b1");
-      if(scrollEl && b1) setTimeout(function(){ scrollEl.scrollTo({top:b1.offsetTop-16,behavior:"smooth"}); },350);
+  function initAudioScreen(root,tasks){
+    var stepsEl=root.querySelector(".step-bar"),playBtn=root.querySelector(".play"),waveEl=root.querySelector(".wave"),timeEl=root.querySelector(".time"),skipBtn=root.querySelector(".skip-btn");
+    var carousel=root.querySelector(".carousel"),dotsWrap=root.querySelector(".dots"),optsWrap=root.querySelector(".options"),checkBtn=root.querySelector(".check");
+    var blockEls=[].slice.call(root.querySelectorAll(".block")),footerEl=root.querySelector(".footer");
+    var N=tasks.length,step=0,taskCorrects=[],audio=null;
+    var BARS=42,bars=[];
+    waveEl.innerHTML="";
+    for(var bi=0;bi<BARS;bi++){
+      var bar=document.createElement("span");bar.className="bar";
+      var h=24+Math.round((Math.sin(bi*1.7)*.5+.5)*60+(bi%5)*4);
+      bar.style.height=Math.min(100,h)+"%";bar.style.animationDelay=(bi*.035).toFixed(2)+"s";
+      waveEl.appendChild(bar);bars.push(bar);
     }
-
-    var player=initPlayer(root, revealTask);
-
-    introCta.addEventListener("click",function(){
-      introModal.classList.add("gone");
-    });
-
-    return {
-      stop: player.stop,
-      refresh: function(){
-        audioListened=false;
-        player.reset();
-        introModal.classList.remove("gone");
-        blockEls.forEach(function(b){ b.style.display="none"; b.style.animation=""; });
-        footerEl.style.display="none";
-        carousel.refresh();
+    function renderSteps(){
+      stepsEl.innerHTML=tasks.map(function(_,i){
+        return '<span class="step-dot '+(i<step?"done":i===step?"active":"")+'">'+(i<step?"✓":(i+1))+"</span>";
+      }).join("");
+    }
+    function renderTask(){
+      var task=tasks[step],items=task.items,opts=task.options,TOTAL=items.length;
+      var answers={},selectedCard=null,current=0,checked=false,audioPlayed=false;
+      renderSteps();
+      blockEls.forEach(function(b){b.style.display="none";b.style.animation="";});
+      footerEl.style.display="none";
+      if(audio){audio.pause();audio.src="";audio=null;}
+      audio=new Audio();
+      playBtn.disabled=false;playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
+      playBtn.setAttribute("aria-label","Воспроизвести");timeEl.textContent="0:00";
+      bars.forEach(function(b){b.classList.remove("played");});
+      audio.addEventListener("timeupdate",function(){
+        if(audio.duration&&isFinite(audio.duration)){
+          var played=Math.round(audio.currentTime/audio.duration*BARS);
+          bars.forEach(function(b,i){b.classList.toggle("played",i<played);});
+          timeEl.textContent=fmt(Math.floor(audio.currentTime));
+        }
+      });
+      audio.addEventListener("ended",function(){
+        playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
+        playBtn.setAttribute("aria-label","Воспроизвести");
+        revealTask();
+      });
+      function revealTask(){
+        if(audioPlayed)return;
+        audioPlayed=true;
+        if(audio)audio.pause();
+        playBtn.disabled=true;
+        blockEls.forEach(function(b){b.style.display="";b.style.animation="rise .5s both";});
+        footerEl.style.display="";
+        var sc=root.querySelector(".scroll"),b1=root.querySelector(".b1");
+        if(sc&&b1)setTimeout(function(){sc.scrollTo({top:b1.offsetTop-16,behavior:"smooth"});},350);
+        renderCarousel();
       }
+      playBtn.onclick=function(){
+        if(audio.paused){
+          if(!audio.src)audio.src=task.audio;
+          audio.play().catch(function(){});
+          playBtn.classList.add("is-playing");waveEl.classList.add("is-playing");
+          playBtn.setAttribute("aria-label","Пауза");
+        }else{
+          audio.pause();
+          playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
+          playBtn.setAttribute("aria-label","Воспроизвести");
+        }
+      };
+      skipBtn.onclick=revealTask;
+      function renderCarousel(){
+        carousel.innerHTML=items.map(function(item,i){
+          return '<article class="card" data-index="'+i+'"><span class="badge">'+item.id+'<span class="tick">✓</span></span><span class="phrase">'+item.text+"</span></article>";
+        }).join("");
+        var cards=[].slice.call(carousel.querySelectorAll(".card"));
+        dotsWrap.innerHTML=items.map(function(_,i){return '<button class="dot'+(i===0?" active":"")+'" aria-label="Карточка '+(i+1)+'"></button>';}).join("");
+        var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
+        dots.forEach(function(d,i){d.onclick=function(){scrollToCard(i);};});
+        optsWrap.innerHTML=opts.map(function(opt){return '<button class="opt" type="button" data-opt="'+opt.id+'">'+opt.text+"</button>";}).join("");
+        if(opts.length>4)optsWrap.classList.add("opts-3col");else optsWrap.classList.remove("opts-3col");
+        var optBtns=[].slice.call(optsWrap.querySelectorAll(".opt"));
+        function sw(){if(!cards[0])return 1;return(cards[0].getBoundingClientRect().width||1)+(parseFloat(getComputedStyle(carousel).gap)||14);}
+        function scrollToCard(i){carousel.scrollTo({left:i*sw(),behavior:"smooth"});}
+        function paintCards(){
+          cards.forEach(function(c,i){
+            c.classList.toggle("is-sel",i===selectedCard);c.classList.toggle("answered",answers[i]!==undefined);
+            if(checked){var ok=task.answer_key[items[i].id]===answers[i];c.classList.toggle("correct",ok);c.classList.toggle("wrong",!ok);}
+          });
+        }
+        function paintOpts(){
+          optBtns.forEach(function(b){
+            var oId=b.getAttribute("data-opt"),mine=selectedCard!==null&&answers[selectedCard]===oId;
+            var used=!mine&&Object.keys(answers).some(function(k){return answers[k]===oId;});
+            b.classList.toggle("is-selected",mine);b.classList.toggle("is-used",used);
+          });
+        }
+        function upCheck(){checkBtn.disabled=Object.keys(answers).length<TOTAL||checked;checkBtn.textContent="Проверить";}
+        cards.forEach(function(c,i){
+          c.onclick=function(){
+            if(checked)return;
+            selectedCard=(selectedCard===i)?null:i;
+            if(selectedCard!==null&&i!==current)scrollToCard(i);
+            paintCards();paintOpts();
+          };
+        });
+        optBtns.forEach(function(b){
+          b.onclick=function(){
+            if(checked||selectedCard===null)return;
+            var oId=b.getAttribute("data-opt");
+            if(answers[selectedCard]===oId){delete answers[selectedCard];}
+            else{
+              Object.keys(answers).forEach(function(k){if(answers[k]===oId)delete answers[k];});
+              answers[selectedCard]=oId;
+              var prev=selectedCard,found=false;
+              for(var k=1;k<=TOTAL;k++){var nx=(prev+k)%TOTAL;if(answers[nx]===undefined){selectedCard=nx;(function(t){setTimeout(function(){scrollToCard(t);},260);})(nx);found=true;break;}}
+              if(!found)selectedCard=null;
+            }
+            paintCards();paintOpts();upCheck();
+          };
+        });
+        var raf2=null;
+        carousel.addEventListener("scroll",function(){
+          if(raf2)return;
+          raf2=requestAnimationFrame(function(){
+            raf2=null;
+            var i=clamp(Math.round(carousel.scrollLeft/sw()),0,TOTAL-1);
+            if(i!==current){current=i;selectedCard=i;dots.forEach(function(d,n){d.classList.toggle("active",n===i);});paintCards();paintOpts();}
+          });
+        },{passive:true});
+        checkBtn.onclick=function(){
+          if(checked)return;
+          checked=true;
+          taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
+          paintCards();
+          checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
+          checkBtn.onclick=function(){
+            if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
+            else showDoneModal(taskCorrects.reduce(function(a,b){return a+b;},0),N*4);
+          };
+        };
+        selectedCard=0;paintCards();paintOpts();upCheck();
+      }
+    }
+    renderTask();
+    return{
+      stop:function(){if(audio)audio.pause();},
+      refresh:function(){step=0;taskCorrects=[];if(audio){audio.pause();audio.src="";audio=null;}renderTask();root.querySelector(".scroll").scrollTop=0;}
     };
   }
 
@@ -1075,12 +902,11 @@
   var screen4El=document.getElementById("screen4");
   var s1=initScreen1(screen1El);
   var s2=initScreen2(screen2El);
-  var s3=initScreen3(screen3El);
-  var s4=initScreen3(screen4El);
-  players.push(s3,s4);
+  var s3=initAudioScreen(screen3El,TASKS_10_12);
+  var s4=initAudioScreen(screen4El,TASKS_13_17);
 
   function showScreen(id){
-    stopAllPlayers();
+    if(s3)s3.stop();if(s4)s4.stop();
     [].slice.call(document.querySelectorAll(".screen")).forEach(function(s){ s.classList.remove("active"); });
     var el=document.getElementById(id);
     el.classList.add("active");

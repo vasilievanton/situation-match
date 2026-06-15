@@ -108,6 +108,12 @@
     font-size:12px;font-weight:500;line-height:1.35;
   }
   .crumbs span:not(:last-child)::after{content:"/";margin-left:6px;color:#C5CBD3;}
+  .crumbs button{
+    appearance:none;border:none;background:transparent;padding:0;
+    color:inherit;font:inherit;font-weight:600;cursor:pointer;
+  }
+  .crumbs button:active{color:var(--accent);}
+  .crumbs button::after{content:"/";margin-left:6px;color:#C5CBD3;}
   .task-intro h1{
     margin:0 0 8px;font-family:"MTS Wide",sans-serif;
     font-size:25px;font-weight:700;line-height:1.15;color:var(--ink);
@@ -470,22 +476,15 @@
 
     <!-- ============ SCREEN 1: 3–5 лет (matching game) ============ -->
     <section class="screen" id="screen1">
-      <div class="topbar">
-        <button class="back" type="button" data-nav="chooser">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          Группы
-        </button>
-        <span class="tb-title">3–5 лет</span>
-      </div>
       <div class="scroll">
-        <div class="step-bar" id="s1-steps"></div>
         <section class="task-intro">
           <nav class="crumbs" aria-label="Хлебные крошки">
-            <span>Главная</span><span>Болталка</span><span>Кафе «Эмпатия»</span>
+            <button type="button" data-nav="chooser">Главная</button><button type="button" data-nav="chooser">Болталка</button><span>Кафе «Эмпатия»</span>
           </nav>
           <h1>Кафе «Эмпатия»</h1>
           <p>Эмпатия — это суперсила, которая помогает лучше понимать людей, замечать чужие эмоции и быть внимательнее друг к другу. В этом задании можно проверить, насколько хорошо ты умеешь замечать важные мелочи: выбирай подходящего героя и нажимай на эмоцию, которая ему подходит</p>
         </section>
+        <div class="step-bar" id="s1-steps"></div>
         <h2 class="title">Подбери эмоцию к каждой картинке</h2>
         <div class="match-grid match-grid-2" id="s1-pics"></div>
         <div class="match-sep"></div>
@@ -499,22 +498,15 @@
 
     <!-- ============ SCREEN 2: 6–9 лет (flip cards) ============ -->
     <section class="screen" id="screen2">
-      <div class="topbar">
-        <button class="back" type="button" data-nav="chooser">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          Группы
-        </button>
-        <span class="tb-title">6–9 лет</span>
-      </div>
       <div class="scroll">
-        <div class="step-bar" id="s2-steps"></div>
         <section class="task-intro">
           <nav class="crumbs" aria-label="Хлебные крошки">
-            <span>Главная</span><span>Болталка</span><span>Кафе «Эмпатия»</span>
+            <button type="button" data-nav="chooser">Главная</button><button type="button" data-nav="chooser">Болталка</button><span>Кафе «Эмпатия»</span>
           </nav>
           <h1>Кафе «Эмпатия»</h1>
           <p>Эмпатия — это суперсила, которая помогает лучше понимать людей, замечать чужие эмоции и быть внимательнее друг к другу. В этом задании можно проверить, насколько хорошо ты умеешь замечать важные мелочи: выбирай подходящего героя и нажимай на эмоцию, которая ему подходит</p>
         </section>
+        <div class="step-bar" id="s2-steps"></div>
         <section class="block b1">
           <h2 class="title" id="s2-title">Выбери ситуацию и эмоцию</h2>
           <div class="carousel"></div>
@@ -533,22 +525,15 @@
 
     <!-- ============ SCREEN 3: 10–12 лет ============ -->
     <section class="screen" id="screen3">
-      <div class="topbar">
-        <button class="back" type="button" data-nav="chooser">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          Группы
-        </button>
-        <span class="tb-title">10–12 лет</span>
-      </div>
       <div class="scroll">
-        <div class="step-bar"></div>
         <section class="task-intro">
           <nav class="crumbs" aria-label="Хлебные крошки">
-            <span>Главная</span><span>Болталка</span><span>Кафе «Эмпатия»</span>
+            <button type="button" data-nav="chooser">Главная</button><button type="button" data-nav="chooser">Болталка</button><span>Кафе «Эмпатия»</span>
           </nav>
           <h1>Кафе «Эмпатия»</h1>
           <p>Эмпатия — это суперсила, которая помогает лучше понимать людей, замечать чужие эмоции и быть внимательнее друг к другу. В этом задании можно проверить, насколько хорошо ты умеешь замечать важные мелочи: выбирай подходящего героя и нажимай на эмоцию, которая ему подходит</p>
         </section>
+        <div class="step-bar"></div>
         <div class="intro-modal gone">
           <div class="intro-backdrop"></div>
           <div class="intro-sheet">
@@ -586,22 +571,15 @@
 
     <!-- ============ SCREEN 4: 13–17 лет ============ -->
     <section class="screen" id="screen4">
-      <div class="topbar">
-        <button class="back" type="button" data-nav="chooser">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          Группы
-        </button>
-        <span class="tb-title">13–17 лет</span>
-      </div>
       <div class="scroll">
-        <div class="step-bar"></div>
         <section class="task-intro">
           <nav class="crumbs" aria-label="Хлебные крошки">
-            <span>Главная</span><span>Болталка</span><span>Кафе «Эмпатия»</span>
+            <button type="button" data-nav="chooser">Главная</button><button type="button" data-nav="chooser">Болталка</button><span>Кафе «Эмпатия»</span>
           </nav>
           <h1>Кафе «Эмпатия»</h1>
           <p>Эмпатия — это суперсила, которая помогает лучше понимать людей, замечать чужие эмоции и быть внимательнее друг к другу. В этом задании можно проверить, насколько хорошо ты умеешь замечать важные мелочи: выбирай подходящего героя и нажимай на эмоцию, которая ему подходит</p>
         </section>
+        <div class="step-bar"></div>
         <div class="intro-modal gone">
           <div class="intro-backdrop"></div>
           <div class="intro-sheet">
@@ -712,7 +690,8 @@
       var footerHeight=footerVisible?footer.offsetHeight:0;
       var scrollRemaining=sc.scrollHeight-sc.clientHeight-sc.scrollTop;
       var clippedByViewport=rootBottom-visualBottom>24;
-      var hasMore=scrollRemaining>12||clippedByViewport;
+      var hideDistance=Math.min(180,Math.max(96,sc.clientHeight*.22));
+      var hasMore=scrollRemaining>hideDistance||(clippedByViewport&&scrollRemaining>48);
       var cueTop=Math.max(72,visualBottom-footerHeight-76);
       cue.style.left=(visualLeft+visualWidth/2)+"px";
       cue.style.top=cueTop+"px";
@@ -927,6 +906,13 @@
         playBtn.disabled=false;
         skipBtn.disabled=false;
       };
+      function resetAudioProgress(){
+        if(audio){
+          try{audio.currentTime=0;}catch(e){}
+        }
+        bars.forEach(function(b){b.classList.remove("played");});
+        timeEl.textContent="0:00";
+      }
       audio.addEventListener("timeupdate",function(){
         if(audio.duration&&isFinite(audio.duration)){
           var played=Math.round(audio.currentTime/audio.duration*BARS);
@@ -936,6 +922,7 @@
       });
       audio.addEventListener("ended",function(){
         playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
+        resetAudioProgress();
         playBtn.disabled=listenCount>=maxListens;
         playBtn.setAttribute("aria-label",listenCount<maxListens?"Повторить аудио":"Аудио прослушано");
         revealTask();
@@ -958,11 +945,7 @@
       playBtn.onclick=function(){
         if(audio.paused){
           if(!audio.src)audio.src=task.audio;
-          if(audio.ended||audio.currentTime>=audio.duration-.05){
-            audio.currentTime=0;
-            bars.forEach(function(b){b.classList.remove("played");});
-            timeEl.textContent="0:00";
-          }
+          if(audio.ended||audio.currentTime>=audio.duration-.05)resetAudioProgress();
           if(audio.currentTime===0){
             if(listenCount>=maxListens){
               playBtn.disabled=true;

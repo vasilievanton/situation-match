@@ -58,7 +58,7 @@
     }
   }
 
-  .screen{display:none;flex-direction:column;flex:1;min-height:0;}
+  .screen{position:relative;display:none;flex-direction:column;flex:1;min-height:0;}
   .screen.active{display:flex;animation:fade .3s both;}
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
 
@@ -279,6 +279,19 @@
   .result.ok{color:var(--ok);}
   .result.warn{color:var(--play);}
   .result.info{color:var(--ink-2);}
+  .scroll-cue{
+    position:absolute;left:50%;z-index:40;
+    display:inline-flex;align-items:center;gap:6px;
+    border:1px solid rgba(29,32,35,.08);border-radius:999px;
+    padding:8px 13px 8px 14px;background:rgba(255,255,255,.94);
+    color:var(--accent);font-family:"MTS Compact",sans-serif;font-size:13px;font-weight:700;
+    box-shadow:0 10px 28px -14px rgba(20,21,24,.36),0 0 0 5px rgba(255,255,255,.58);
+    cursor:pointer;pointer-events:none;opacity:0;
+    transform:translate(-50%,8px);transition:opacity .2s ease,transform .2s ease;
+  }
+  .scroll-cue.show{opacity:1;pointer-events:auto;transform:translate(-50%,0);animation:scrollCueFloat 1.25s ease-in-out infinite;}
+  .scroll-cue svg{width:15px;height:15px;stroke-width:2.8;}
+  @keyframes scrollCueFloat{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,5px);}}
 
   @keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
@@ -640,6 +653,29 @@
       setTimeout(function(){el.classList.remove("nudge-pick");},460);
     });
   }
+  function setupScrollCue(root){
+    var sc=root.querySelector(".scroll");
+    if(!sc)return {update:function(){}};
+    var cue=document.createElement("button");
+    cue.className="scroll-cue";
+    cue.type="button";
+    cue.innerHTML='Листай вниз <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+    root.appendChild(cue);
+    function update(){
+      var footer=root.querySelector(".footer");
+      var footerVisible=footer&&getComputedStyle(footer).display!=="none";
+      var bottom=(footerVisible?footer.offsetHeight:0)+10;
+      var hasMore=sc.scrollHeight-sc.clientHeight-sc.scrollTop>36;
+      cue.style.bottom=bottom+"px";
+      cue.classList.toggle("show",root.classList.contains("active")&&hasMore);
+    }
+    cue.onclick=function(){sc.scrollBy({top:Math.max(180,sc.clientHeight*.55),behavior:"smooth"});};
+    sc.addEventListener("scroll",update,{passive:true});
+    sc.addEventListener("load",update,true);
+    window.addEventListener("resize",update);
+    setTimeout(update,0);
+    return {update:update};
+  }
 
   /* ============================================================
      SCREEN 1 — 3–5 лет
@@ -692,6 +728,7 @@
         taskCorrects[step]=task.items.filter(function(it){return task.answer_key[it.id]===answers[it.id];}).length;
         rePics();
         setResult(root,"Верно "+taskCorrects[step]+" из "+task.items.length,"info");
+        setTimeout(updateScrollCues,0);
         nextBtn.textContent=step<N-1?"Далее":"Завершить";nextBtn.disabled=false;
         nextBtn.onclick=function(){
           if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
@@ -782,6 +819,7 @@
         taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
         paintCards();
         setResult(root,"Верно "+taskCorrects[step]+" из "+TOTAL,"info");
+        setTimeout(updateScrollCues,0);
         checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
         checkBtn.onclick=function(){
           if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
@@ -856,6 +894,8 @@
         var sc=root.querySelector(".scroll"),b1=root.querySelector(".b1");
         if(sc&&b1)setTimeout(function(){sc.scrollTo({top:b1.offsetTop-16,behavior:"smooth"});},350);
         renderCarousel();
+        setTimeout(updateScrollCues,80);
+        setTimeout(updateScrollCues,500);
       }
       playBtn.onclick=function(){
         if(audio.paused){
@@ -934,6 +974,7 @@
           taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
           paintCards();
           setResult(root,"Верно "+taskCorrects[step]+" из "+TOTAL,"info");
+          setTimeout(updateScrollCues,0);
           checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
           checkBtn.onclick=function(){
             if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
@@ -959,6 +1000,15 @@
   var s2=initScreen2(screen2El);
   var s3=initAudioScreen(screen3El,TASKS_10_12);
   var s4=initAudioScreen(screen4El,TASKS_13_17);
+  var scrollCues=[
+    setupScrollCue(screen1El),
+    setupScrollCue(screen2El),
+    setupScrollCue(screen3El),
+    setupScrollCue(screen4El)
+  ];
+  function updateScrollCues(){
+    scrollCues.forEach(function(c){c.update();});
+  }
 
   function showScreen(id){
     if(s3)s3.stop();if(s4)s4.stop();
@@ -970,6 +1020,9 @@
     if(id==="screen2") s2.refresh();
     if(id==="screen3") s3.refresh();
     if(id==="screen4") s4.refresh();
+    setTimeout(updateScrollCues,80);
+    setTimeout(updateScrollCues,500);
+    setTimeout(updateScrollCues,1200);
   }
 
   [].slice.call(document.querySelectorAll("[data-nav]")).forEach(function(btn){

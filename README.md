@@ -1,101 +1,105 @@
 # Situation Match
 
-Static single-page exercise for the Cafe Empathy activity. The app is built as a standalone HTML file with inline CSS and JavaScript, local MTS fonts, and media/data embedded directly in `index.html`.
+Статическое одностраничное упражнение для задания `Кафе «Эмпатия»`. Приложение собрано как один самостоятельный HTML-файл: стили и JavaScript находятся прямо в `index.html`, шрифты MTS лежат локально в папке `fonts/`, данные заданий тоже встроены в страницу.
 
-## Purpose
+## Смысл проекта
 
-The exercise helps children practice empathy: noticing emotional cues, matching situations with emotions, and identifying who did what after listening to short audio scenes.
+Упражнение помогает детям тренировать эмпатию: замечать эмоции, сопоставлять ситуации с чувствами и определять, кто что делал, после коротких аудиосцен.
 
-All age modes share the same context block:
+Во всех возрастных режимах есть общий вводный блок:
 
-- Breadcrumbs: `Главная / Болталка / Кафе «Эмпатия»`
-- Title: `Кафе «Эмпатия»`
-- Description about empathy as a superpower and the task goal.
+- хлебные крошки: `Главная / Болталка / Кафе «Эмпатия»`;
+- заголовок: `Кафе «Эмпатия»`;
+- описание про эмпатию как суперсилу и цель задания.
 
-## Main Files
+## Основные файлы
 
-- `index.html` - production page used by GitHub Pages.
-- `fonts/` - local MTS Wide and MTS Compact font files.
-- `situation-match.html` - older/alternate version kept in the repository.
-- `json.json` - source-like data file, currently untracked in this working tree.
-- `letter_password.html` - unrelated/untracked file in this working tree.
+- `index.html` - основная страница, которая используется на GitHub Pages.
+- `fonts/` - локальные шрифты MTS Wide и MTS Compact.
+- `situation-match.html` - старая или альтернативная версия страницы, оставлена в репозитории.
+- `json.json` - файл с данными, сейчас в рабочем дереве не отслеживается git.
+- `letter_password.html` - посторонний файл, сейчас в рабочем дереве не отслеживается git.
 
-## Age Modes
+## Возрастные режимы
 
 ### 3-5
 
-Image matching task:
+Задание на сопоставление картинок и эмоций:
 
-- User selects one top image card.
-- Then user selects one emotion option below.
-- Options are unique; selecting an option already used moves it from the previous card.
-- Nothing is selected automatically.
-- If the user taps a lower option before selecting a top card, top cards play a short hint animation.
+- пользователь выбирает одну верхнюю карточку с картинкой;
+- затем выбирает подходящую эмоцию в нижнем блоке;
+- эмоции уникальны: если выбрать уже использованную эмоцию, она переносится с прошлой карточки на новую;
+- ничего не выбирается автоматически;
+- если нажать нижний вариант до выбора верхней карточки, верхние карточки коротко подёргиваются как подсказка.
 
 ### 6-9
 
-Flip-card matching task:
+Задание с переворачивающимися карточками:
 
-- User taps a card to select it.
-- Tapping the selected card flips it to show the situation text.
-- Then user chooses an emotion option below.
-- Nothing is selected automatically after a match or after carousel scroll.
-- If the user taps an option before selecting a card, top cards play a short hint animation.
+- пользователь нажимает карточку, чтобы выбрать её;
+- повторный клик по выбранной карточке переворачивает её и показывает описание ситуации;
+- затем пользователь выбирает эмоцию в нижнем блоке;
+- после ответа и после свайпа карусели ничего не выбирается автоматически;
+- если нажать вариант до выбора карточки, верхние карточки коротко подёргиваются как подсказка.
 
 ### 10-12
 
-Audio-based matching task:
+Задание с аудио:
 
-- A modal explains that audio must be listened to first.
-- The task is revealed after the first listen ends or after `Пропустить аудио`.
-- Audio can be listened to at most two times total per task.
-- Pausing and resuming does not count as a new listen.
-- After the second full listen, the play button is disabled.
+- перед стартом показывается модалка с объяснением, что сначала нужно послушать аудио;
+- задание открывается после первого полного прослушивания или после кнопки `Пропустить аудио`;
+- аудио можно послушать максимум два раза суммарно на одно задание;
+- пауза и продолжение не считаются новым прослушиванием;
+- после второго полного прослушивания кнопка воспроизведения блокируется.
 
 ### 13-17
 
-Audio-based matching task:
+Задание с аудио:
 
-- A modal explains that audio must be listened to first.
-- The task is revealed after the listen ends or after `Пропустить аудио`.
-- Audio can be listened to only once.
+- перед стартом показывается модалка с объяснением, что сначала нужно послушать аудио;
+- задание открывается после прослушивания или после кнопки `Пропустить аудио`;
+- аудио можно послушать только один раз.
 
-## Checking Answers
+## Проверка ответов
 
-After the user fills every item in the current task:
+Когда пользователь заполнил все пункты текущего задания:
 
-- `Проверить` becomes enabled.
-- Correct cards receive `correct` styling.
-- Wrong cards receive `wrong` styling.
-- Result text shows `Верно X из Y`.
-- The button changes to `Далее` or `Завершить`.
+- кнопка `Проверить` становится активной;
+- правильные карточки получают стиль `correct`;
+- неправильные карточки получают стиль `wrong`;
+- под кнопкой показывается результат `Верно X из Y`;
+- кнопка меняется на `Далее` или `Завершить`.
 
-## Scroll Hint
+## Подсказка скролла
 
-The app has a floating `Листай вниз` cue for screens where more content is below the visible area. It should:
+В приложении есть плавающая подсказка `Листай вниз` для экранов, где ниже видимой области есть продолжение.
 
-- appear only on the active screen;
-- sit above the fixed footer and mobile browser UI;
-- hide near the bottom of the scroll area;
-- scroll the exercise down when tapped.
+Она должна:
 
-Mobile Safari and Chrome have dynamic browser toolbars, so the cue needs to use `visualViewport` or fixed viewport-aware positioning rather than relying only on the app container height.
+- появляться только на активном экране;
+- быть видимой над фиксированным футером и нижней панелью мобильного браузера;
+- исчезать ближе к низу прокрутки;
+- по нажатию прокручивать упражнение ниже.
 
-## Development
+На мобильных Safari и Chrome нижняя панель браузера динамически меняет реальную видимую высоту экрана. Поэтому подсказка позиционируется через `visualViewport` и `position: fixed`, а не только относительно контейнера приложения.
 
-No build step is required. Open `index.html` directly or serve the folder locally:
+## Локальный запуск
+
+Сборка не нужна. Можно открыть `index.html` напрямую или поднять локальный сервер из папки проекта:
 
 ```bash
 python3 -m http.server 4173
 ```
 
-Then open:
+После этого открыть:
 
 ```text
 http://localhost:4173/index.html
 ```
 
-For syntax checks, extract and check the inline script:
+## Проверки перед коммитом
+
+Так как JavaScript встроен внутрь HTML, для проверки синтаксиса нужно сначала извлечь содержимое `<script>` во временный файл:
 
 ```bash
 node -e "const fs=require('fs'); const html=fs.readFileSync('index.html','utf8'); const m=html.match(/<script>([\s\S]*)<\/script>/); fs.writeFileSync('/tmp/situation-match-index-script.js', m ? m[1] : '');"
@@ -103,22 +107,22 @@ node --check /tmp/situation-match-index-script.js
 git diff --check
 ```
 
-## Deployment
+## Деплой
 
-Changes are committed to `master` and pushed to:
+Изменения коммитятся в ветку `master` и пушатся в репозиторий:
 
 ```text
 https://github.com/vasilievanton/situation-match.git
 ```
 
-The live page is served through GitHub Pages at `vasilievanton.github.io`.
+Живая страница открывается через GitHub Pages на `vasilievanton.github.io`.
 
-## Git Notes
+## Git-заметки
 
-There are untracked files in the current working tree that are not part of recent changes:
+В рабочем дереве есть неотслеживаемые файлы, которые не относятся к последним изменениям:
 
-- `json.json`
-- `letter_password.html`
-- screenshot PNG files with Russian names
+- `json.json`;
+- `letter_password.html`;
+- PNG-скриншоты с русскими именами.
 
-Do not stage or remove them unless explicitly requested.
+Не добавлять и не удалять их без отдельной просьбы.

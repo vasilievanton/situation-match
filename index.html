@@ -181,8 +181,12 @@
 
   /* ---------- SCREEN 2: flip cards (6-9) ---------- */
   .flip-wrap{
-    flex:0 0 calc(100% - 58px);scroll-snap-align:start;
+    flex:0 0 calc(100% - 100px);scroll-snap-align:start;
     perspective:1000px;min-height:218px;
+  }
+  .flip-wrap.is-sel .flip-front,.flip-wrap.is-sel .flip-back{
+    outline-color:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft),0 16px 36px -20px rgba(50,35,110,.3);
   }
   .flip-inner{
     position:relative;width:100%;min-height:218px;
@@ -206,10 +210,13 @@
   .flip-wrap.wrong .flip-front,.flip-wrap.wrong .flip-back{outline-color:var(--err);}
   .flip-wrap.answered .flip-front .badge .tick{display:grid;}
   .flip-hint{font-size:12px;color:var(--muted);font-weight:500;}
+  .flip-ico{font-size:52px;line-height:1;}
+  .flip-word{font-size:18px;font-weight:700;text-align:center;color:var(--ink);}
   .flip-desc{font-size:14px;line-height:1.6;color:var(--ink-2);text-align:center;}
 
   /* ---------- SCREEN 1: matching game (3-5) ---------- */
   .match-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px;}
+  .match-grid-2{grid-template-columns:1fr 1fr;}
   .match-card{
     position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;
     padding:28px 6px 12px;cursor:pointer;font-family:inherit;
@@ -416,9 +423,10 @@
       </div>
       <div class="scroll">
         <div class="step-bar" id="s1-steps"></div>
-        <h2 class="title">Выбери картинку и эмоцию к ней</h2>
-        <div class="pic-pair" id="s1-pics"></div>
-        <div class="options" id="s1-opts"></div>
+        <h2 class="title">Подбери эмоцию к каждой картинке</h2>
+        <div class="match-grid match-grid-2" id="s1-pics"></div>
+        <div class="match-sep"></div>
+        <div class="options" id="s1-emos"></div>
       </div>
       <div class="footer">
         <button class="check" type="button" id="s1-next" disabled>Далее</button>
@@ -436,13 +444,18 @@
         <span class="tb-title">6–9 лет</span>
       </div>
       <div class="scroll">
-        <div class="step-bar" id="s2-steps"></div>
-        <h2 class="title">Выбери ситуацию и эмоцию к ней</h2>
-        <div class="sit-card" id="s2-sit"></div>
-        <div class="options opts-col" id="s2-opts"></div>
+        <section class="block b1">
+          <h2 class="title">Что происходило</h2>
+          <div class="carousel"></div>
+          <div class="dots"></div>
+        </section>
+        <section class="block b2">
+          <h2 class="title">Варианты</h2>
+          <div class="options"></div>
+        </section>
       </div>
       <div class="footer">
-        <button class="check" type="button" id="s2-next" disabled>Далее</button>
+        <button class="check" type="button" disabled>Проверить</button>
         <div class="result"></div>
       </div>
     </section>
@@ -588,20 +601,19 @@
     "Лера":"👩","Тёма":"🧒","Девушка с фотоаппаратом":"📷"
   };
 
-  var STEPS_3_5 = [
-    { pairBg:["#fce8ef","#fef3e2"], pics:[{id:"A",emoji:"🤗",desc:"Обнимает"},{id:"B",emoji:"😄",desc:"Смеётся"}],       emotions:["Доброта","Игривость","Любовь","Гордость"] },
-    { pairBg:["#e8f4ff","#fff3e8"], pics:[{id:"A",emoji:"😤",desc:"Сердится"},{id:"B",emoji:"😊",desc:"Доволен"}],        emotions:["Злость","Радость","Обида","Спокойствие"] },
-    { pairBg:["#e8effc","#fce8ef"], pics:[{id:"A",emoji:"😢",desc:"Плачет"},{id:"B",emoji:"😟",desc:"Переживает"}],      emotions:["Грусть","Тревога","Страх","Одиночество"] },
-    { pairBg:["#fff3e8","#e8fcef"], pics:[{id:"A",emoji:"😁",desc:"Гордится"},{id:"B",emoji:"🤩",desc:"Восхищается"}],   emotions:["Гордость","Восторг","Радость","Удивление"] },
-    { pairBg:["#e8fcef","#e8f4ff"], pics:[{id:"A",emoji:"😨",desc:"Испугался"},{id:"B",emoji:"😏",desc:"Озорничает"}],  emotions:["Страх","Игривость","Смущение","Беспокойство"] }
+  var BATCHES_3_5 = [
+    { pics:[{id:"A",emoji:"🤗"},{id:"B",emoji:"😄"},{id:"C",emoji:"😢"},{id:"D",emoji:"😠"}], emotions:["Доброта","Радость","Грусть","Злость"] },
+    { pics:[{id:"A",emoji:"😨"},{id:"B",emoji:"😌"},{id:"C",emoji:"🤩"},{id:"D",emoji:"😒"}], emotions:["Страх","Спокойствие","Восторг","Скука"] },
+    { pics:[{id:"A",emoji:"😁"},{id:"B",emoji:"😔"},{id:"C",emoji:"😳"},{id:"D",emoji:"🥰"}], emotions:["Гордость","Грусть","Смущение","Любовь"] },
+    { pics:[{id:"A",emoji:"😰"},{id:"B",emoji:"🤗"},{id:"C",emoji:"😤"},{id:"D",emoji:"😂"}], emotions:["Тревога","Благодарность","Обида","Веселье"] },
+    { pics:[{id:"A",emoji:"😭"},{id:"B",emoji:"😍"},{id:"C",emoji:"😬"},{id:"D",emoji:"😎"}], emotions:["Горе","Восхищение","Нервозность","Уверенность"] }
   ];
 
-  var STEPS_6_9 = [
-    { icon:"🏃", bg:"#e8effc", situation:"Ты играешь с ребятами во дворе. Вдруг к вам подходят дети постарше. Один мальчик начинает дразнить твоего друга и толкает его плечом. У тебя внутри будто всё закипает. Хочется защитить друга и остановить обидчика.", emotions:["Злость","Страх","Доброта"] },
-    { icon:"🎁", bg:"#fef3e2", situation:"Тебе подарили на день рождения именно то, о чём ты давно мечтал. Ты держишь подарок в руках и не можешь поверить, что это правда. Сердце быстро бьётся от счастья.",                                                          emotions:["Радость","Удивление","Благодарность"] },
-    { icon:"🏫", bg:"#fce8ef", situation:"Ты пришёл в новый класс. Все ребята уже знакомы друг с другом, а ты никого не знаешь. Ты стоишь у двери и не знаешь, куда сесть.",                                                                                          emotions:["Страх","Одиночество","Смущение"] },
-    { icon:"🐶", bg:"#e8fcef", situation:"Твой любимый питомец заболел. Ты видишь, что ему плохо, и ничем не можешь помочь. Внутри становится тяжело и хочется плакать.",                                                                                              emotions:["Грусть","Тревога","Нежность"] },
-    { icon:"🏆", bg:"#e8f4ff", situation:"Ты долго тренировался и наконец выиграл соревнование. Тренер пожимает тебе руку, а друзья хлопают в ладоши. Ты чувствуешь, что всё получилось.",                                                                            emotions:["Гордость","Радость","Облегчение"] }
+  var FLIP_6_9 = [
+    { id:"A", emoji:"🏃", front:"Убегает от собаки",   desc:"Мальчик увидел большую собаку без поводка и очень быстро побежал прочь. Сердце колотилось, ноги не слушались.",                                    answer:"Страх" },
+    { id:"B", emoji:"🎂", front:"День рождения",        desc:"Все друзья пришли на праздник, торт был огромным, а подарки — самыми лучшими. Девочка прыгала от счастья.",                                         answer:"Радость" },
+    { id:"C", emoji:"💔", front:"Сломали игрушку",      desc:"Старший брат случайно сломал любимую машинку. Малыш сжал кулаки и почувствовал, как внутри всё закипает.",                                          answer:"Обида" },
+    { id:"D", emoji:"🌅", front:"Вечер дома",           desc:"После шумного дня ребёнок лёг на диван, укрылся пледом и смотрел в окно. Всё хорошо, ничего не беспокоит.",                                       answer:"Спокойствие" }
   ];
 
   var TOTAL = SITUATIONS.length;
@@ -656,67 +668,80 @@
   }
 
   /* ============================================================
-     SCREEN 1 — 3–5 лет: картинка + эмоция
+     SCREEN 1 — 3–5 лет: 5 пачек по 4 картинки + 4 эмоции
      ============================================================ */
   function initScreen1(root){
     var stepsEl=root.querySelector("#s1-steps");
     var picsEl=root.querySelector("#s1-pics");
-    var optsEl=root.querySelector("#s1-opts");
+    var emosEl=root.querySelector("#s1-emos");
     var nextBtn=root.querySelector("#s1-next");
-    var N=STEPS_3_5.length;
-    var step=0, pickedPic=null, pickedEmo=null;
+    var N=BATCHES_3_5.length;
+    var step=0, answers={}, selectedPic=null;
 
     function renderSteps(){
-      stepsEl.innerHTML=STEPS_3_5.map(function(_,i){
+      stepsEl.innerHTML=BATCHES_3_5.map(function(_,i){
         var cls=i<step?"done":i===step?"active":"";
         return '<span class="step-dot '+cls+'">'+(i<step?"✓":(i+1))+"</span>";
       }).join("");
     }
     function renderPics(){
-      var s=STEPS_3_5[step];
-      picsEl.innerHTML=s.pics.map(function(p,idx){
-        return '<button class="pic-card" type="button" data-pic="'+p.id+'" style="--pic-bg:'+s.pairBg[idx]+'">'
-          +'<div class="pic-img-area"><span class="pic-ltr">'+p.id+'</span><span class="pic-emoji">'+p.emoji+'</span></div>'
-          +'<span class="pic-desc">'+p.desc+'</span>'
+      var b=BATCHES_3_5[step];
+      picsEl.innerHTML=b.pics.map(function(p){
+        var ans=answers[p.id]||"";
+        var isSel=selectedPic===p.id;
+        var isAns=!!ans;
+        var cls="match-card"+(isSel?" is-active":"")+(isAns&&!isSel?" answered":"");
+        return '<button class="'+cls+'" type="button" data-pic="'+p.id+'">'
+          +'<span class="match-emoji">'+p.emoji+'</span>'
+          +(ans?'<span class="match-label">'+ans+'</span>':'')
           +'</button>';
       }).join("");
-      [].slice.call(picsEl.querySelectorAll(".pic-card")).forEach(function(btn){
+      [].slice.call(picsEl.querySelectorAll(".match-card")).forEach(function(btn){
         btn.addEventListener("click",function(){
-          pickedPic=btn.getAttribute("data-pic");
-          [].slice.call(picsEl.querySelectorAll(".pic-card")).forEach(function(b){
-            b.classList.toggle("is-picked",b.getAttribute("data-pic")===pickedPic);
-          });
-          updateNext();
+          var id=btn.getAttribute("data-pic");
+          selectedPic=(selectedPic===id)?null:id;
+          renderPics(); renderEmos();
         });
       });
     }
-    function renderOpts(){
-      var s=STEPS_3_5[step];
-      optsEl.innerHTML=s.emotions.map(function(e){
-        return '<button class="opt" type="button" data-emo="'+e+'">'+e+'</button>';
+    function renderEmos(){
+      var b=BATCHES_3_5[step];
+      emosEl.innerHTML=b.emotions.map(function(e){
+        var isAssigned=Object.keys(answers).some(function(k){ return answers[k]===e; });
+        var isMine=!!(selectedPic&&answers[selectedPic]===e);
+        var isUsed=isAssigned&&!isMine;
+        return '<button class="opt'+(isUsed?" is-used":"")+(isMine?" is-selected":"")+'" type="button" data-emo="'+e+'">'+e+'</button>';
       }).join("");
-      [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(btn){
+      [].slice.call(emosEl.querySelectorAll(".opt")).forEach(function(btn){
         btn.addEventListener("click",function(){
-          pickedEmo=btn.getAttribute("data-emo");
-          [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(b){
-            b.classList.toggle("is-selected",b.getAttribute("data-emo")===pickedEmo);
-          });
-          updateNext();
+          if(!selectedPic) return;
+          var e=btn.getAttribute("data-emo");
+          if(answers[selectedPic]===e){ delete answers[selectedPic]; }
+          else {
+            Object.keys(answers).forEach(function(k){ if(answers[k]===e) delete answers[k]; });
+            answers[selectedPic]=e;
+          }
+          var b=BATCHES_3_5[step];
+          var unanswered=b.pics.filter(function(p){ return !answers[p.id]; });
+          selectedPic=unanswered.length>0?unanswered[0].id:null;
+          renderPics(); renderEmos(); updateNext();
         });
       });
     }
     function updateNext(){
-      nextBtn.disabled=!(pickedPic&&pickedEmo);
+      var b=BATCHES_3_5[step];
+      var done=b.pics.every(function(p){ return answers[p.id]; });
+      nextBtn.disabled=!done;
       nextBtn.textContent=(step===N-1)?"Завершить":"Далее";
     }
     function render(){
-      pickedPic=null; pickedEmo=null;
-      renderSteps(); renderPics(); renderOpts(); updateNext();
+      answers={}; selectedPic=null;
+      renderSteps(); renderPics(); renderEmos(); updateNext();
     }
 
     nextBtn.addEventListener("click",function(){
       if(step<N-1){ step++; render(); root.querySelector(".scroll").scrollTop=0; }
-      else { showDoneModal(N,N,"Ты ответил на все вопросы"); }
+      else { showDoneModal(N,N); }
     });
 
     render();
@@ -724,56 +749,127 @@
   }
 
   /* ============================================================
-     SCREEN 2 — 6–9 лет: ситуация + эмоция
+     SCREEN 2 — 6–9 лет: flip cards carousel + эмоции
      ============================================================ */
   function initScreen2(root){
-    var stepsEl=root.querySelector("#s2-steps");
-    var sitEl=root.querySelector("#s2-sit");
-    var optsEl=root.querySelector("#s2-opts");
-    var nextBtn=root.querySelector("#s2-next");
-    var N=STEPS_6_9.length;
-    var step=0, pickedEmo=null;
+    var carousel=root.querySelector(".carousel");
+    var dotsWrap=root.querySelector(".dots");
+    var optsWrap=root.querySelector(".options");
+    var checkBtn=root.querySelector(".check");
+    var resultEl=root.querySelector(".result");
+    var answers={}, current=0, selectedCard=null;
+    var TOTAL2=FLIP_6_9.length;
 
-    function renderSteps(){
-      stepsEl.innerHTML=STEPS_6_9.map(function(_,i){
-        var cls=i<step?"done":i===step?"active":"";
-        return '<span class="step-dot '+cls+'">'+(i<step?"✓":(i+1))+"</span>";
-      }).join("");
-    }
-    function renderSit(){
-      var s=STEPS_6_9[step];
-      sitEl.innerHTML='<div class="sit-illus" style="background:'+s.bg+'">'+s.icon+'</div>'
-        +'<p class="sit-text">'+s.situation+'</p>';
-    }
-    function renderOpts(){
-      var s=STEPS_6_9[step];
-      optsEl.innerHTML=s.emotions.map(function(e){
-        return '<button class="opt" type="button" data-emo="'+e+'">'+e+'</button>';
-      }).join("");
-      [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(btn){
-        btn.addEventListener("click",function(){
-          pickedEmo=btn.getAttribute("data-emo");
-          [].slice.call(optsEl.querySelectorAll(".opt")).forEach(function(b){
-            b.classList.toggle("is-selected",b.getAttribute("data-emo")===pickedEmo);
-          });
-          nextBtn.disabled=false;
-        });
+    carousel.innerHTML=FLIP_6_9.map(function(f,i){
+      return '<div class="flip-wrap" data-index="'+i+'">'
+        +'<div class="flip-inner">'
+        +'<div class="flip-front">'
+        +'<div class="badge">'+f.id+'<span class="tick">✓</span></div>'
+        +'<span class="flip-ico">'+f.emoji+'</span>'
+        +'<span class="flip-word">'+f.front+'</span>'
+        +'<span class="flip-hint">нажми, чтобы узнать подробнее</span>'
+        +'</div>'
+        +'<div class="flip-back">'
+        +'<div class="badge">'+f.id+'<span class="tick">✓</span></div>'
+        +'<p class="flip-desc">'+f.desc+'</p>'
+        +'</div>'
+        +'</div>'
+        +'</div>';
+    }).join("");
+    var cards=[].slice.call(carousel.querySelectorAll(".flip-wrap"));
+
+    dotsWrap.innerHTML=FLIP_6_9.map(function(_,i){
+      return '<button class="dot'+(i===0?' active':'')+'" aria-label="Ситуация '+(i+1)+'"></button>';
+    }).join("");
+    var dots=[].slice.call(dotsWrap.querySelectorAll(".dot"));
+    dots.forEach(function(dot,i){ dot.addEventListener("click",function(){ scrollToCard(i); }); });
+
+    var optEmotions=FLIP_6_9.map(function(f){ return f.answer; });
+    optsWrap.innerHTML=optEmotions.map(function(e){
+      return '<button class="opt" type="button" data-emo="'+e+'">'+e+'</button>';
+    }).join("");
+    var opts=[].slice.call(optsWrap.querySelectorAll(".opt"));
+
+    function step2(){ if(!cards[0]) return 1; var gap=parseFloat(getComputedStyle(carousel).gap)||14; return (cards[0].getBoundingClientRect().width||1)+gap; }
+    function scrollToCard(i){ carousel.scrollTo({left:i*step2(),behavior:"smooth"}); }
+
+    function paintCards(){
+      cards.forEach(function(c,i){
+        c.classList.toggle("is-sel", i===selectedCard);
+        c.classList.toggle("answered", answers[i]!==undefined);
       });
     }
-    function render(){
-      pickedEmo=null;
-      renderSteps(); renderSit(); renderOpts();
-      nextBtn.disabled=true;
-      nextBtn.textContent=(step===N-1)?"Завершить":"Далее";
+    function paintOptions(){
+      opts.forEach(function(btn){
+        var e=btn.getAttribute("data-emo");
+        var isSelected=selectedCard!==null && answers[selectedCard]===e;
+        var isUsed=!isSelected && (function(){ var u=false; Object.keys(answers).forEach(function(k){ if(answers[k]===e) u=true; }); return u; })();
+        btn.classList.toggle("is-selected",isSelected);
+        btn.classList.toggle("is-used",isUsed);
+      });
+    }
+    function updateCheck(){
+      var n=Object.keys(answers).length;
+      if(n===TOTAL2){ checkBtn.textContent="Проверить"; checkBtn.disabled=false; }
+      else { checkBtn.textContent=(n>0)?("Выбрано "+n+" из "+TOTAL2):"Проверить"; checkBtn.disabled=true; }
     }
 
-    nextBtn.addEventListener("click",function(){
-      if(step<N-1){ step++; render(); root.querySelector(".scroll").scrollTop=0; }
-      else { showDoneModal(N,N,"Ты ответил на все вопросы"); }
+    cards.forEach(function(c,i){
+      c.addEventListener("click",function(){
+        c.classList.toggle("flipped");
+        selectedCard=i;
+        if(i!==current){ scrollToCard(i); }
+        paintCards(); paintOptions();
+      });
     });
 
-    render();
-    return { refresh:function(){ step=0; render(); } };
+    opts.forEach(function(btn){
+      btn.addEventListener("click",function(){
+        if(selectedCard===null){ checkBtn.classList.remove("shake"); void checkBtn.offsetWidth; checkBtn.classList.add("shake"); return; }
+        var e=btn.getAttribute("data-emo");
+        if(answers[selectedCard]===e){
+          delete answers[selectedCard];
+          cards[selectedCard].classList.remove("answered","correct","wrong");
+          paintCards(); paintOptions(); updateCheck(); return;
+        }
+        Object.keys(answers).forEach(function(k){ if(answers[k]===e){ delete answers[k]; cards[parseInt(k,10)].classList.remove("answered","correct","wrong"); } });
+        answers[selectedCard]=e;
+        cards[selectedCard].classList.add("answered"); cards[selectedCard].classList.remove("correct","wrong");
+        var prev=selectedCard;
+        if(Object.keys(answers).length<TOTAL2){
+          for(var kk=1;kk<=TOTAL2;kk++){
+            var nx=(prev+kk)%TOTAL2;
+            if(answers[nx]===undefined){ selectedCard=nx; (function(t){ setTimeout(function(){ scrollToCard(t); },260); })(nx); break; }
+          }
+        } else { selectedCard=null; }
+        paintCards(); paintOptions(); updateCheck();
+      });
+    });
+
+    var raf2=null;
+    carousel.addEventListener("scroll",function(){
+      if(raf2) return;
+      raf2=requestAnimationFrame(function(){
+        raf2=null;
+        var i=clamp(Math.round(carousel.scrollLeft/step2()),0,TOTAL2-1);
+        if(i!==current){ current=i; selectedCard=i; dots.forEach(function(d,n){ d.classList.toggle("active",n===i); }); paintCards(); paintOptions(); }
+      });
+    },{passive:true});
+
+    checkBtn.addEventListener("click",function(){
+      var correct=0;
+      cards.forEach(function(c,i){ var ok=answers[i]===FLIP_6_9[i].answer; if(ok) correct++; c.classList.toggle("correct",ok); c.classList.toggle("wrong",!ok); });
+      showDoneModal(correct,TOTAL2);
+    });
+
+    updateCheck();
+    return { refresh:function(){
+      answers={}; selectedCard=null; current=0;
+      carousel.scrollTo({left:0,behavior:"instant"});
+      cards.forEach(function(c){ c.classList.remove("answered","correct","wrong","is-sel","flipped"); });
+      opts.forEach(function(b){ b.classList.remove("is-selected","is-used"); });
+      updateCheck();
+    }};
   }
 
   /* ============================================================

@@ -554,8 +554,8 @@
           <div class="intro-sheet">
             <span class="intro-icon">▶</span>
             <h2 class="intro-title">Сначала послушай аудио</h2>
-            <p class="intro-body">После прослушивания откроются задания. Повторно включить аудио не получится.</p>
-            <p class="intro-note">Слушай внимательно с первого раза.</p>
+            <p class="intro-body">После первого прослушивания откроются задания. Аудио можно включить ещё один раз.</p>
+            <p class="intro-note">Всего доступно два прослушивания.</p>
             <button class="intro-cta" type="button">Понятно</button>
           </div>
         </div>
@@ -885,7 +885,9 @@
   /* ============================================================
      SCREENS 3 & 4 — аудио + карусель
      ============================================================ */
-  function initAudioScreen(root,tasks){
+  function initAudioScreen(root,tasks,config){
+    config=config||{};
+    var maxListens=config.maxListens||1;
     var stepsEl=root.querySelector(".step-bar"),playBtn=root.querySelector(".play"),waveEl=root.querySelector(".wave"),timeEl=root.querySelector(".time"),skipBtn=root.querySelector(".skip-btn");
     var carousel=root.querySelector(".carousel"),dotsWrap=root.querySelector(".dots"),optsWrap=root.querySelector(".options"),checkBtn=root.querySelector(".check");
     var introModal=root.querySelector(".intro-modal"),introCta=root.querySelector(".intro-cta");
@@ -906,7 +908,7 @@
     }
     function renderTask(){
       var task=tasks[step],items=task.items,opts=task.options,TOTAL=items.length;
-      var answers={},selectedCard=null,current=0,checked=false,audioPlayed=false;
+      var answers={},selectedCard=null,current=0,checked=false,audioPlayed=false,listenCount=0;
       renderSteps();
       setResult(root,"","");
       blockEls.forEach(function(b){b.style.display="none";b.style.animation="";});
@@ -931,14 +933,17 @@
       });
       audio.addEventListener("ended",function(){
         playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
-        playBtn.setAttribute("aria-label","Воспроизвести");
+        playBtn.disabled=listenCount>=maxListens;
+        playBtn.setAttribute("aria-label",listenCount<maxListens?"Повторить аудио":"Аудио прослушано");
         revealTask();
       });
       function revealTask(){
         if(audioPlayed)return;
         audioPlayed=true;
         if(audio)audio.pause();
-        playBtn.disabled=true;
+        playBtn.disabled=listenCount>=maxListens;
+        playBtn.setAttribute("aria-label",listenCount<maxListens?"Повторить аудио":"Аудио прослушано");
+        skipBtn.disabled=true;
         blockEls.forEach(function(b){b.style.display="";b.style.animation="rise .5s both";});
         footerEl.style.display="";
         var sc=root.querySelector(".scroll"),b1=root.querySelector(".b1");
@@ -950,6 +955,19 @@
       playBtn.onclick=function(){
         if(audio.paused){
           if(!audio.src)audio.src=task.audio;
+          if(audio.ended||audio.currentTime>=audio.duration-.05){
+            audio.currentTime=0;
+            bars.forEach(function(b){b.classList.remove("played");});
+            timeEl.textContent="0:00";
+          }
+          if(audio.currentTime===0){
+            if(listenCount>=maxListens){
+              playBtn.disabled=true;
+              playBtn.setAttribute("aria-label","Аудио прослушано");
+              return;
+            }
+            listenCount++;
+          }
           audio.play().catch(function(){});
           playBtn.classList.add("is-playing");waveEl.classList.add("is-playing");
           playBtn.setAttribute("aria-label","Пауза");
@@ -1048,7 +1066,7 @@
   var screen4El=document.getElementById("screen4");
   var s1=initScreen1(screen1El);
   var s2=initScreen2(screen2El);
-  var s3=initAudioScreen(screen3El,TASKS_10_12);
+  var s3=initAudioScreen(screen3El,TASKS_10_12,{maxListens:2});
   var s4=initAudioScreen(screen4El,TASKS_13_17);
   var scrollCues=[
     setupScrollCue(screen1El),

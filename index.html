@@ -271,6 +271,7 @@
   .result{text-align:center;font-weight:500;font-size:14px;margin-top:10px;min-height:18px;color:var(--muted);}
   .result.ok{color:var(--ok);}
   .result.warn{color:var(--play);}
+  .result.info{color:var(--ink-2);}
 
   @keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
@@ -381,6 +382,9 @@
   /* ── skip button ───────────────────────────────────────────── */
   .skip-btn{border:none;background:transparent;color:var(--muted);font-family:"MTS Compact",sans-serif;font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px;white-space:nowrap;flex-shrink:0;text-decoration:underline;text-underline-offset:2px;}
   .skip-btn:hover{color:var(--accent);}
+  #screen3 .player,#screen4 .player{justify-content:center;flex-wrap:wrap;padding-top:22px;}
+  #screen3 .player .wave,#screen4 .player .wave{flex:0 1 230px;}
+  #screen3 .skip-btn,#screen4 .skip-btn{flex:0 0 100%;order:2;margin-top:2px;text-align:center;}
   /* ── 3-col options grid (13-17 has up to 6 options) ──────── */
   .opts-3col{grid-template-columns:1fr 1fr 1fr;}
 </style>
@@ -492,6 +496,16 @@
       </div>
       <div class="scroll">
         <div class="step-bar"></div>
+        <div class="intro-modal gone">
+          <div class="intro-backdrop"></div>
+          <div class="intro-sheet">
+            <span class="intro-icon">▶</span>
+            <h2 class="intro-title">Сначала послушай аудио</h2>
+            <p class="intro-body">После прослушивания откроются задания. Повторно включить аудио не получится.</p>
+            <p class="intro-note">Слушай внимательно с первого раза.</p>
+            <button class="intro-cta" type="button">Понятно</button>
+          </div>
+        </div>
         <section class="player">
           <button class="play" aria-label="Воспроизвести">
             <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg>
@@ -499,7 +513,7 @@
           </button>
           <div class="wave" aria-hidden="true"></div>
           <span class="time">0:00</span>
-          <button class="skip-btn" type="button">Пропустить</button>
+          <button class="skip-btn" type="button">Пропустить аудио</button>
         </section>
         <section class="block b1">
           <h2 class="title">Что происходило</h2>
@@ -528,6 +542,16 @@
       </div>
       <div class="scroll">
         <div class="step-bar"></div>
+        <div class="intro-modal gone">
+          <div class="intro-backdrop"></div>
+          <div class="intro-sheet">
+            <span class="intro-icon">▶</span>
+            <h2 class="intro-title">Сначала послушай аудио</h2>
+            <p class="intro-body">После прослушивания откроются задания. Повторно включить аудио не получится.</p>
+            <p class="intro-note">Слушай внимательно с первого раза.</p>
+            <button class="intro-cta" type="button">Понятно</button>
+          </div>
+        </div>
         <section class="player">
           <button class="play" aria-label="Воспроизвести">
             <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg>
@@ -535,7 +559,7 @@
           </button>
           <div class="wave" aria-hidden="true"></div>
           <span class="time">0:00</span>
-          <button class="skip-btn" type="button">Пропустить</button>
+          <button class="skip-btn" type="button">Пропустить аудио</button>
         </section>
         <section class="block b1">
           <h2 class="title">Что происходило</h2>
@@ -595,6 +619,12 @@
     doneScore.textContent=msg||(all?"Все ответы верны":("Верно "+correct+" из "+total));
     doneModal.classList.remove("gone");
   }
+  function setResult(root,msg,type){
+    var el=root.querySelector(".result");
+    if(!el) return;
+    el.className="result"+(type?" "+type:"");
+    el.textContent=msg||"";
+  }
 
   /* ============================================================
      SCREEN 1 — 3–5 лет
@@ -610,6 +640,7 @@
     function renderTask(){
       var task=TASKS_3_5[step],answers={},selectedPic=null,checked=false;
       renderSteps();
+      setResult(root,"","");
       function rePics(){
         picsEl.innerHTML=task.items.map(function(item){
           var oId=answers[item.id]||"",opt=task.options.filter(function(o){return o.id===oId;})[0];
@@ -634,8 +665,7 @@
             var oId=b.getAttribute("data-opt");
             if(answers[selectedPic]===oId){delete answers[selectedPic];}
             else{Object.keys(answers).forEach(function(k){if(answers[k]===oId)delete answers[k];});answers[selectedPic]=oId;}
-            var un=task.items.filter(function(it){return !answers[it.id];});
-            selectedPic=un.length?un[0].id:null;
+            selectedPic=null;
             rePics();reEmos();upBtn();
           };
         });
@@ -646,6 +676,7 @@
         checked=true;
         taskCorrects[step]=task.items.filter(function(it){return task.answer_key[it.id]===answers[it.id];}).length;
         rePics();
+        setResult(root,"Проверили. Можно перейти дальше.","info");
         nextBtn.textContent=step<N-1?"Далее":"Завершить";nextBtn.disabled=false;
         nextBtn.onclick=function(){
           if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
@@ -673,6 +704,7 @@
       var task=TASKS_6_9[step],items=task.items,opts=task.options,TOTAL=items.length;
       var answers={},selectedCard=null,current=0,checked=false;
       renderSteps();
+      setResult(root,"","");
       carousel.innerHTML=items.map(function(item,i){
         return '<div class="flip-wrap" data-index="'+i+'"><div class="flip-inner"><div class="flip-front flip-front-img"><div class="badge">'+item.id+'<span class="tick">✓</span></div><img class="flip-img" src="'+item.image+'" alt=""><span class="flip-hint">нажми, чтобы узнать подробнее</span></div><div class="flip-back"><div class="badge">'+item.id+'<span class="tick">✓</span></div><p class="flip-desc">'+item.text+"</p></div></div></div>";
       }).join("");
@@ -714,9 +746,7 @@
           else{
             Object.keys(answers).forEach(function(k){if(answers[k]===oId)delete answers[k];});
             answers[selectedCard]=oId;
-            var prev=selectedCard,found=false;
-            for(var k=1;k<=TOTAL;k++){var nx=(prev+k)%TOTAL;if(answers[nx]===undefined){selectedCard=nx;(function(t){setTimeout(function(){scrollToCard(t);},260);})(nx);found=true;break;}}
-            if(!found)selectedCard=null;
+            selectedCard=null;
           }
           paintCards();paintOpts();upCheck();
         };
@@ -727,7 +757,7 @@
         raf2=requestAnimationFrame(function(){
           raf2=null;
           var i=clamp(Math.round(carousel.scrollLeft/sw()),0,TOTAL-1);
-          if(i!==current){current=i;if(selectedCard===null)selectedCard=i;dots.forEach(function(d,n){d.classList.toggle("active",n===i);});paintCards();paintOpts();}
+          if(i!==current){current=i;dots.forEach(function(d,n){d.classList.toggle("active",n===i);});paintCards();paintOpts();}
         });
       },{passive:true});
       checkBtn.onclick=function(){
@@ -735,13 +765,14 @@
         checked=true;
         taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
         paintCards();
+        setResult(root,"Проверили. Можно идти дальше.","info");
         checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
         checkBtn.onclick=function(){
           if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
           else showDoneModal(taskCorrects.reduce(function(a,b){return a+b;},0),N*3);
         };
       };
-      selectedCard=0;paintCards();paintOpts();upCheck();
+      paintCards();paintOpts();upCheck();
     }
     renderTask();
     return{refresh:function(){step=0;taskCorrects=[];renderTask();root.querySelector(".scroll").scrollTop=0;}};
@@ -753,6 +784,7 @@
   function initAudioScreen(root,tasks){
     var stepsEl=root.querySelector(".step-bar"),playBtn=root.querySelector(".play"),waveEl=root.querySelector(".wave"),timeEl=root.querySelector(".time"),skipBtn=root.querySelector(".skip-btn");
     var carousel=root.querySelector(".carousel"),dotsWrap=root.querySelector(".dots"),optsWrap=root.querySelector(".options"),checkBtn=root.querySelector(".check");
+    var introModal=root.querySelector(".intro-modal"),introCta=root.querySelector(".intro-cta");
     var blockEls=[].slice.call(root.querySelectorAll(".block")),footerEl=root.querySelector(".footer");
     var N=tasks.length,step=0,taskCorrects=[],audio=null;
     var BARS=42,bars=[];
@@ -772,13 +804,20 @@
       var task=tasks[step],items=task.items,opts=task.options,TOTAL=items.length;
       var answers={},selectedCard=null,current=0,checked=false,audioPlayed=false;
       renderSteps();
+      setResult(root,"","");
       blockEls.forEach(function(b){b.style.display="none";b.style.animation="";});
       footerEl.style.display="none";
       if(audio){audio.pause();audio.src="";audio=null;}
       audio=new Audio();
-      playBtn.disabled=false;playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
+      playBtn.disabled=true;skipBtn.disabled=true;playBtn.classList.remove("is-playing");waveEl.classList.remove("is-playing");
       playBtn.setAttribute("aria-label","Воспроизвести");timeEl.textContent="0:00";
       bars.forEach(function(b){b.classList.remove("played");});
+      if(introModal)introModal.classList.remove("gone");
+      if(introCta)introCta.onclick=function(){
+        if(introModal)introModal.classList.add("gone");
+        playBtn.disabled=false;
+        skipBtn.disabled=false;
+      };
       audio.addEventListener("timeupdate",function(){
         if(audio.duration&&isFinite(audio.duration)){
           var played=Math.round(audio.currentTime/audio.duration*BARS);
@@ -858,9 +897,7 @@
             else{
               Object.keys(answers).forEach(function(k){if(answers[k]===oId)delete answers[k];});
               answers[selectedCard]=oId;
-              var prev=selectedCard,found=false;
-              for(var k=1;k<=TOTAL;k++){var nx=(prev+k)%TOTAL;if(answers[nx]===undefined){selectedCard=nx;(function(t){setTimeout(function(){scrollToCard(t);},260);})(nx);found=true;break;}}
-              if(!found)selectedCard=null;
+              selectedCard=null;
             }
             paintCards();paintOpts();upCheck();
           };
@@ -871,7 +908,7 @@
           raf2=requestAnimationFrame(function(){
             raf2=null;
             var i=clamp(Math.round(carousel.scrollLeft/sw()),0,TOTAL-1);
-            if(i!==current){current=i;selectedCard=i;dots.forEach(function(d,n){d.classList.toggle("active",n===i);});paintCards();paintOpts();}
+            if(i!==current){current=i;dots.forEach(function(d,n){d.classList.toggle("active",n===i);});paintCards();paintOpts();}
           });
         },{passive:true});
         checkBtn.onclick=function(){
@@ -879,13 +916,14 @@
           checked=true;
           taskCorrects[step]=items.filter(function(item,i){return task.answer_key[item.id]===answers[i];}).length;
           paintCards();
+          setResult(root,"Проверили. Можно продолжить.","info");
           checkBtn.textContent=step<N-1?"Далее":"Завершить";checkBtn.disabled=false;
           checkBtn.onclick=function(){
             if(step<N-1){step++;renderTask();root.querySelector(".scroll").scrollTop=0;}
             else showDoneModal(taskCorrects.reduce(function(a,b){return a+b;},0),N*4);
           };
         };
-        selectedCard=0;paintCards();paintOpts();upCheck();
+        paintCards();paintOpts();upCheck();
       }
     }
     renderTask();

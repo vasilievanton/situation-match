@@ -259,6 +259,40 @@
 
   @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+  /* ---------- intro modal ---------- */
+  .intro-modal{
+    position:absolute;inset:0;z-index:50;
+    display:flex;align-items:flex-end;
+  }
+  .intro-backdrop{
+    position:absolute;inset:0;
+    background:rgba(22,21,40,.52);
+    backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  }
+  .intro-sheet{
+    position:relative;z-index:1;width:100%;
+    background:#fff;border-radius:28px 28px 0 0;
+    padding:32px 24px calc(36px + env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
+  }
+  .intro-icon{font-size:54px;line-height:1;margin-bottom:2px;}
+  .intro-title{margin:0;font-size:23px;font-weight:800;letter-spacing:-.01em;color:var(--ink);}
+  .intro-body{margin:0;font-size:15px;line-height:1.55;color:var(--ink-2);max-width:300px;}
+  .intro-note{
+    margin:0;font-size:13px;font-weight:600;color:var(--muted);
+    padding:10px 16px;background:var(--surface-2);border-radius:12px;
+  }
+  .intro-cta{
+    width:100%;margin-top:6px;border:none;cursor:pointer;
+    border-radius:var(--r-btn);padding:18px;
+    font-family:inherit;font-weight:800;font-size:18px;color:#fff;
+    background:linear-gradient(135deg,var(--accent-2),var(--accent));
+    box-shadow:0 18px 32px -14px var(--accent-soft);transition:transform .12s ease;
+  }
+  .intro-cta:active{transform:scale(.985);}
+  .intro-modal.gone{display:none;}
+  .play:disabled{background:var(--surface-3);box-shadow:none;cursor:default;opacity:.5;}
 </style>
 </head>
 <body>
@@ -378,6 +412,16 @@
 
     <!-- ============ SCREEN 3: 10–12 лет ============ -->
     <section class="screen" id="screen3">
+      <div class="intro-modal" id="intro3">
+        <div class="intro-backdrop"></div>
+        <div class="intro-sheet">
+          <span class="intro-icon">🎧</span>
+          <h2 class="intro-title">Сначала послушай</h2>
+          <p class="intro-body">Сейчас прозвучит история. Слушай внимательно — потом нужно будет вспомнить, кто и что делал.</p>
+          <p class="intro-note">Аудио можно воспроизвести только один раз</p>
+          <button class="intro-cta" type="button">Готов слушать</button>
+        </div>
+      </div>
       <div class="topbar">
         <button class="back" type="button" data-nav="chooser">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -493,7 +537,7 @@
 
   /* ---------------- audio player ---------------- */
   var players=[];
-  function initPlayer(screen){
+  function initPlayer(screen, onEnd){
     var playBtn=screen.querySelector(".play");
     var wave=screen.querySelector(".wave");
     var timeEl=screen.querySelector(".time");
@@ -513,13 +557,14 @@
     }
     function stop(){ clearInterval(timer); timer=null; playBtn.classList.remove("is-playing"); wave.classList.remove("is-playing"); playBtn.setAttribute("aria-label","Воспроизвести"); }
     playBtn.addEventListener("click",function(){
+      if(playBtn.disabled) return;
       if(timer){ stop(); return; }
       if(cur>=DURATION) cur=0;
       playBtn.classList.add("is-playing"); wave.classList.add("is-playing"); playBtn.setAttribute("aria-label","Пауза");
-      timer=setInterval(function(){ cur++; paint(); if(cur>=DURATION){ paint(); stop(); cur=0; setTimeout(paint,400); } },1000);
+      timer=setInterval(function(){ cur++; paint(); if(cur>=DURATION){ paint(); stop(); cur=0; setTimeout(paint,400); if(onEnd) onEnd(); } },1000);
     });
     paint();
-    return { stop:stop };
+    return { stop:stop, reset:function(){ cur=0; playBtn.disabled=false; paint(); } };
   }
   function stopAllPlayers(){ players.forEach(function(p){ p.stop(); }); }
 
@@ -888,6 +933,55 @@
     }};
   }
 
+  /* ============================================================
+     SCREEN 3 — 10–12 лет: modal intro + audio lock + carousel
+     ============================================================ */
+  function initScreen3(root){
+    var introModal=root.querySelector(".intro-modal");
+    var introCta=root.querySelector(".intro-cta");
+    var blockEls=[].slice.call(root.querySelectorAll(".block"));
+    var footerEl=root.querySelector(".footer");
+    var playBtn=root.querySelector(".play");
+    var audioListened=false;
+
+    blockEls.forEach(function(b){ b.style.display="none"; });
+    footerEl.style.display="none";
+
+    var carousel=initCarouselScreen(root);
+
+    function revealTask(){
+      if(audioListened) return;
+      audioListened=true;
+      playBtn.disabled=true;
+      blockEls.forEach(function(b){
+        b.style.display="";
+        b.style.animation="rise .5s both";
+      });
+      footerEl.style.display="";
+      var scrollEl=root.querySelector(".scroll");
+      var b1=root.querySelector(".b1");
+      if(scrollEl && b1) setTimeout(function(){ scrollEl.scrollTo({top:b1.offsetTop-16,behavior:"smooth"}); },350);
+    }
+
+    var player=initPlayer(root, revealTask);
+
+    introCta.addEventListener("click",function(){
+      introModal.classList.add("gone");
+    });
+
+    return {
+      stop: player.stop,
+      refresh: function(){
+        audioListened=false;
+        player.reset();
+        introModal.classList.remove("gone");
+        blockEls.forEach(function(b){ b.style.display="none"; b.style.animation=""; });
+        footerEl.style.display="none";
+        carousel.refresh();
+      }
+    };
+  }
+
   /* ---------------- navigation ---------------- */
   var screen1El=document.getElementById("screen1");
   var screen2El=document.getElementById("screen2");
@@ -895,9 +989,9 @@
   var screen4El=document.getElementById("screen4");
   var s1=initScreen1(screen1El);
   var s2=initScreen2(screen2El);
-  var s3=initCarouselScreen(screen3El);
+  var s3=initScreen3(screen3El);
   var s4=initCarouselScreen(screen4El);
-  players.push(initPlayer(screen1El),initPlayer(screen2El),initPlayer(screen3El),initPlayer(screen4El));
+  players.push(initPlayer(screen1El),initPlayer(screen2El),s3,initPlayer(screen4El));
 
   function showScreen(id){
     stopAllPlayers();

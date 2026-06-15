@@ -704,8 +704,14 @@
     function update(){
       var footer=root.querySelector(".footer");
       var footerVisible=footer&&getComputedStyle(footer).display!=="none";
-      var bottom=(footerVisible?footer.offsetHeight:0)+10;
-      var hasMore=sc.scrollHeight-sc.clientHeight-sc.scrollTop>36;
+      var vv=window.visualViewport;
+      var hiddenByBrowser=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;
+      var visualBottom=vv?(vv.offsetTop+vv.height):window.innerHeight;
+      var rootBottom=root.getBoundingClientRect().bottom;
+      var bottom=(footerVisible?footer.offsetHeight:0)+10+hiddenByBrowser;
+      var scrollRemaining=sc.scrollHeight-sc.clientHeight-sc.scrollTop;
+      var clippedByViewport=rootBottom-visualBottom>24;
+      var hasMore=scrollRemaining>12||clippedByViewport;
       cue.style.bottom=bottom+"px";
       cue.classList.toggle("show",root.classList.contains("active")&&hasMore);
     }
@@ -713,6 +719,10 @@
     sc.addEventListener("scroll",update,{passive:true});
     sc.addEventListener("load",update,true);
     window.addEventListener("resize",update);
+    if(window.visualViewport){
+      window.visualViewport.addEventListener("resize",update);
+      window.visualViewport.addEventListener("scroll",update);
+    }
     setTimeout(update,0);
     return {update:update};
   }

@@ -823,8 +823,10 @@
       cards.forEach(function(c,i){
         c.onclick=function(){
           if(checked) return;
+          var sameCard=selectedCard===i;
           selectedCard=i;
-          c.classList.add("flipped");
+          if(sameCard)c.classList.toggle("flipped");
+          else c.classList.add("flipped");
           if(i!==current)scrollToCard(i);
           paintCards();paintOpts();
         };

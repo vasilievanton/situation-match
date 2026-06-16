@@ -139,6 +139,12 @@
   .wave.is-playing .bar{animation:eq .85s ease-in-out infinite;}
   @keyframes eq{0%,100%{transform:scaleY(.55);}50%{transform:scaleY(1);}}
   .time{flex:0 0 auto;font-weight:500;font-size:14px;color:var(--muted);min-width:40px;text-align:right;font-variant-numeric:tabular-nums;}
+  .audio-reminder{
+    margin:16px 20px 0;padding:12px 14px;border-radius:16px;
+    background:var(--accent-soft);color:var(--ink);
+    font-size:14px;line-height:1.45;font-weight:500;
+  }
+  .audio-reminder strong{font-family:"MTS Wide",sans-serif;font-size:13px;color:var(--accent);}
 
   /* ── section title ────────────────────────────────────────────── */
   .title{margin:16px 0 14px;text-align:center;font-family:"MTS Wide",sans-serif;font-size:22px;font-weight:700;padding:0 20px;}
@@ -550,6 +556,9 @@
             <button class="intro-cta" type="button">Понятно</button>
           </div>
         </div>
+        <div class="audio-reminder">
+          <strong>Слушай очень внимательно.</strong> Запоминай все детали: потом по ним нужно будет отвечать.
+        </div>
         <section class="player">
           <button class="play" aria-label="Воспроизвести">
             <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.87l11-6.5a1 1 0 0 0 0-1.74l-11-6.5A1 1 0 0 0 8 5.5Z"/></svg>
@@ -595,6 +604,9 @@
             <p class="intro-note">Слушай внимательно с первого раза.</p>
             <button class="intro-cta" type="button">Понятно</button>
           </div>
+        </div>
+        <div class="audio-reminder">
+          <strong>Слушай очень внимательно.</strong> Запоминай все детали: потом по ним нужно будет отвечать.
         </div>
         <section class="player">
           <button class="play" aria-label="Воспроизвести">
